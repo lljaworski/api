@@ -1,5 +1,13 @@
 #!/bin/bash
 
+WITH_SERVER=false
+for arg in "$@"; do
+  if [ "$arg" == "--with-server" ]; then
+    WITH_SERVER=true
+    break
+  fi
+done
+
 echo "Starting Docker Compose services..."
 docker-compose up -d
 
@@ -16,7 +24,9 @@ php bin/console doctrine:database:create
 echo "Running database migrations..."
 php bin/console doctrine:migrations:migrate --no-interaction
 
-echo "Starting Symfony development server..."
-symfony server:start -d
+if [ "$WITH_SERVER" = true ]; then
+  echo "Starting Symfony development server..."
+  symfony server:start -d
+fi
 
 echo "Project boot script finished."

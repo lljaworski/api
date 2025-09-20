@@ -20,6 +20,8 @@ This is a Symfony 7.3 API project built with API Platform 4.2, following modern 
 - `config/packages/` - Bundle configurations
 - `migrations/` - Doctrine database migrations
 - `tests/` - PHPUnit test files
+- `boot_project.sh` - **MANDATORY**: Project startup script for development and testing
+- `shutdown_project.sh` - **MANDATORY**: Project cleanup script
 
 ## Code Style and Standards
 
@@ -94,6 +96,18 @@ class ExampleEntity
 - Use Symfony's testing tools and fixtures
 - Test both success and error scenarios
 - Mock external dependencies
+- **MANDATORY**: Use automation scripts for test environment setup:
+  - `./boot_project.sh` for unit tests (database only, no server)
+  - `./boot_project.sh --with-server` for integration/functional tests
+  - `./shutdown_project.sh` to clean up after testing
+
+## Project Management Scripts
+- **`./boot_project.sh`**: Starts Docker services, database, and migrations
+  - Use without parameters for unit testing environments
+  - Use with `--with-server` for full development environment
+- **`./shutdown_project.sh`**: Stops all services and cleans cache
+- **ALWAYS** use these scripts instead of manual Docker or Symfony commands
+- **NEVER** bypass these scripts when setting up test environments
 
 ## Common Patterns
 
@@ -168,13 +182,18 @@ final class EntityProcessor implements ProcessorInterface
 
 ## Development Workflow
 1. **ALWAYS use API Platform for endpoints** - create API Resources, not controllers
-2. Create entities with `php bin/console make:entity`
-3. Generate migrations with `php bin/console make:migration`
-4. Configure API Platform resources with attributes in `src/ApiResource/`
-5. Implement State Providers/Processors in `src/State/` for custom logic
-6. Write tests before implementing complex logic
-7. Use `php bin/console debug:router` to verify routes
-8. Test API endpoints with built-in documentation at `/api/docs`
+2. **MANDATORY: Use project automation scripts for testing and development**
+   - Use `./boot_project.sh` to start Docker services and database for testing
+   - Use `./boot_project.sh --with-server` to start everything including Symfony server
+   - Use `./shutdown_project.sh` to properly stop all services and clean up
+   - For unit tests only: use `./boot_project.sh` (without --with-server option)
+3. Create entities with `php bin/console make:entity`
+4. Generate migrations with `php bin/console make:migration`
+5. Configure API Platform resources with attributes in `src/ApiResource/`
+6. Implement State Providers/Processors in `src/State/` for custom logic
+7. Write tests before implementing complex logic
+8. Use `php bin/console debug:router` to verify routes
+9. Test API endpoints with built-in documentation at `/api/docs`
 
 ## Performance Tips
 - Use serialization groups to limit data transfer
