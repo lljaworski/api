@@ -13,9 +13,10 @@ This is a Symfony 7.3 API project built with API Platform 4.2, following modern 
 
 ## Project Structure
 - `src/Entity/` - Doctrine entities and API resources
-- `src/Controller/` - Custom controllers (use sparingly with API Platform)
+- `src/Controller/` - **AVOID**: Only for non-API endpoints (redirects, webhooks, etc.)
 - `src/Repository/` - Custom repository classes
-- `src/ApiResource/` - API Platform specific resources and DTOs
+- `src/ApiResource/` - API Platform specific resources and DTOs (**PREFERRED** for all API endpoints)
+- `src/State/` - State Providers and Processors for custom business logic
 - `config/packages/` - Bundle configurations
 - `migrations/` - Doctrine database migrations
 - `tests/` - PHPUnit test files
@@ -31,11 +32,13 @@ This is a Symfony 7.3 API project built with API Platform 4.2, following modern 
 - Follow Symfony naming conventions
 
 ### API Platform Best Practices
+- **MANDATORY**: Use API Platform for ALL endpoints - never create traditional Symfony controllers for API endpoints
 - Use attributes for API Platform configuration (not annotations)
 - Prefer API Platform's automatic operations over custom controllers
 - Use State Providers and State Processors for complex business logic
 - Implement proper serialization groups for different contexts
 - Use API Platform's built-in validation with Symfony Validator
+- Create API Resources (DTOs) instead of direct entity exposure when appropriate
 
 ### Entity Design
 ```php
@@ -164,12 +167,14 @@ final class EntityProcessor implements ProcessorInterface
 - Follow OWASP guidelines for API security
 
 ## Development Workflow
-1. Create entities with `php bin/console make:entity`
-2. Generate migrations with `php bin/console make:migration`
-3. Configure API Platform resources with attributes
-4. Write tests before implementing complex logic
-5. Use `php bin/console debug:router` to verify routes
-6. Test API endpoints with built-in documentation at `/api/docs`
+1. **ALWAYS use API Platform for endpoints** - create API Resources, not controllers
+2. Create entities with `php bin/console make:entity`
+3. Generate migrations with `php bin/console make:migration`
+4. Configure API Platform resources with attributes in `src/ApiResource/`
+5. Implement State Providers/Processors in `src/State/` for custom logic
+6. Write tests before implementing complex logic
+7. Use `php bin/console debug:router` to verify routes
+8. Test API endpoints with built-in documentation at `/api/docs`
 
 ## Performance Tips
 - Use serialization groups to limit data transfer
