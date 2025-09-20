@@ -181,7 +181,64 @@ curl http://localhost:8000/api/health
 curl http://localhost:8000/api/ping
 ```
 
-## 🛠️ Development Commands
+## � Authentication
+
+The API uses JWT (JSON Web Token) authentication for secure access to protected endpoints.
+
+### Admin Credentials
+
+A default admin user is created automatically during database migration:
+
+- **Username**: `admin`
+- **Password**: `admin`
+- **Roles**: `ROLE_ADMIN`, `ROLE_USER`
+
+⚠️ **Important**: Change these default credentials in production environments!
+
+### Authentication Endpoints
+
+#### Login
+```bash
+# Authenticate and get JWT token
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin"}' \
+  http://localhost:8000/api/login_check
+```
+
+Response:
+```json
+{
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..."
+}
+```
+
+#### Access Protected Endpoints
+```bash
+# Use the token to access protected endpoints
+curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  http://localhost:8000/api/protected
+```
+
+### Public vs Protected Endpoints
+
+**Public Endpoints** (no authentication required):
+- `GET /api/health` - Health check
+- `GET /api/ping` - Simple ping
+- `POST /api/login_check` - Authentication
+
+**Protected Endpoints** (require JWT token):
+- `GET /api/protected` - Protected demo endpoint
+
+### JWT Token Management
+
+JWT tokens are:
+- Valid for 1 hour by default
+- Signed with RSA256 algorithm
+- Include user roles and username in payload
+- Must be included in `Authorization: Bearer <token>` header
+
+## �🛠️ Development Commands
 
 ### Project Management Scripts
 
