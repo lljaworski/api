@@ -90,6 +90,33 @@ class ExampleEntity
 - Implement proper error handling
 - Add type hints for return values
 
+## Testing and Debugging Practices
+
+### API Testing Guidelines
+- **Use curl for endpoint testing** - prefer command-line testing over browser
+- **Test different content types**: JSON, JSON-LD, HTML, YAML
+- **Verify response headers** and status codes
+- **Test error scenarios** and edge cases
+
+### Common curl Examples
+```bash
+# Test JSON response
+curl -H "Accept: application/json" http://localhost:8000/api/health
+
+# Test JSON-LD response  
+curl -H "Accept: application/ld+json" http://localhost:8000/api/health
+
+# Test with verbose output
+curl -v http://localhost:8000/api/health
+
+# Format JSON output
+curl -s http://localhost:8000/api/health | python3 -m json.tool
+
+# Test POST requests
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"field":"value"}' http://localhost:8000/api/resource
+```
+
 ### Testing Guidelines
 - Write unit tests for business logic
 - Create functional tests for API endpoints
@@ -187,13 +214,14 @@ final class EntityProcessor implements ProcessorInterface
    - Use `./boot_project.sh --with-server` to start everything including Symfony server
    - Use `./shutdown_project.sh` to properly stop all services and clean up
    - For unit tests only: use `./boot_project.sh` (without --with-server option)
-3. Create entities with `php bin/console make:entity`
-4. Generate migrations with `php bin/console make:migration`
-5. Configure API Platform resources with attributes in `src/ApiResource/`
-6. Implement State Providers/Processors in `src/State/` for custom logic
-7. Write tests before implementing complex logic
-8. Use `php bin/console debug:router` to verify routes
-9. Test API endpoints with built-in documentation at `/api/docs`
+3. **Use curl for API testing and URL examination** - prefer curl over browser for endpoint testing
+4. Create entities with `php bin/console make:entity`
+5. Generate migrations with `php bin/console make:migration`
+6. Configure API Platform resources with attributes in `src/ApiResource/`
+7. Implement State Providers/Processors in `src/State/` for custom logic
+8. Write tests before implementing complex logic
+9. Use `php bin/console debug:router` to verify routes
+10. Test API endpoints with built-in documentation at `/api/docs`
 
 ## Performance Tips
 - Use serialization groups to limit data transfer
