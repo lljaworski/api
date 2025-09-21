@@ -91,7 +91,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     #[Assert\NotBlank(groups: ['user:create'])]
-    #[Assert\Length(min: 6, groups: ['user:create', 'user:update'])]
+    #[Assert\Length(min: 6, groups: ['user:create'])]
     #[Groups(['user:create', 'user:update'])]
     private string $password;
 
@@ -209,6 +209,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isDeleted(): bool
     {
         return $this->deletedAt !== null;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->deletedAt === null;
     }
 
     public function softDelete(): static

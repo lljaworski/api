@@ -13,17 +13,29 @@ framework:
                     max_retries: 3
                     multiplier: 2
             failed: 'doctrine://default?queue_name=failed'
-            # sync: 'sync://'
+            sync: 'sync://'
 
-        default_bus: messenger.bus.default
-
+        # CQRS Configuration with separate buses
+        default_bus: command.bus
+        
         buses:
-            messenger.bus.default: []
+            # Command Bus - for state changes
+            command.bus:
+                middleware:
+                    - validation
+                    - doctrine_transaction
+            
+            # Query Bus - for data retrieval
+            query.bus:
+                middleware:
+                    - validation
 
         routing:
+            # Email and notification routing (keep existing async)
             Symfony\Component\Mailer\Messenger\SendEmailMessage: async
             Symfony\Component\Notifier\Message\ChatMessage: async
             Symfony\Component\Notifier\Message\SmsMessage: async
 
-            # Route your messages to the transports
-            # 'App\Message\YourMessage': async
+            # CQRS routing - all synchronous for this project
+            'App\Application\Command\*': sync
+            'App\Application\Query\*': sync

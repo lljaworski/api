@@ -108,4 +108,42 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /**
+     * Find active users with pagination and optional search
+     * 
+     * @return User[]
+     */
+    public function findActiveUsers(int $limit, int $offset = 0, ?string $search = null): array
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->andWhere('u.deletedAt IS NULL')
+            ->orderBy('u.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+            
+        if ($search !== null) {
+            $qb->andWhere('u.username LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+        
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Count active users with optional search
+     */
+    public function countActiveUsers(?string $search = null): int
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->andWhere('u.deletedAt IS NULL');
+            
+        if ($search !== null) {
+            $qb->andWhere('u.username LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+        
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
 }
