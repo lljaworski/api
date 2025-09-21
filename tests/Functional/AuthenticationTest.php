@@ -6,14 +6,24 @@ namespace App\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\User;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AuthenticationTest extends WebTestCase
 {
+    use DatabaseTestTrait;
+    
     private $client;
+    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
+        $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
+        
+        // Ensure test admin user exists
+        $this->ensureTestAdmin();
     }
 
     public function testLoginWithValidCredentials(): void
@@ -22,7 +32,7 @@ class AuthenticationTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
             'username' => 'admin',
-            'password' => 'admin'
+            'password' => 'admin123'
         ]));
 
         $response = $this->client->getResponse();
@@ -98,7 +108,7 @@ class AuthenticationTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
             'username' => 'admin',
-            'password' => 'admin'
+            'password' => 'admin123'
         ]));
 
         $loginResponse = $this->client->getResponse();
@@ -193,7 +203,7 @@ class AuthenticationTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
             'username' => 'admin',
-            'password' => 'admin'
+            'password' => 'admin123'
         ]));
 
         $response = $this->client->getResponse();
@@ -216,5 +226,16 @@ class AuthenticationTest extends WebTestCase
         $this->assertGreaterThan(time(), $payload['exp']);
         // Check that issued at is not in the future
         $this->assertLessThanOrEqual(time(), $payload['iat']);
+    }
+
+    protected function tearDown(): void
+    {
+        // Clean up test data
+        $this->cleanupTestData();
+        
+        // Clean up entity manager
+        $this->entityManager->close();
+        
+        parent::tearDown();
     }
 }
