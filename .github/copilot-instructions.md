@@ -92,6 +92,13 @@ class ExampleEntity
 
 ## Testing and Debugging Practices
 
+### **CRITICAL**: Database Test Isolation Requirements
+- **MANDATORY**: For ANY test that interacts with the database, follow the comprehensive test instructions in `.github/test.instructions.md`
+- **MANDATORY**: Use `DatabaseTestTrait` from `tests/Functional/DatabaseTestTrait.php` for all functional tests
+- **MANDATORY**: Always use `generateUniqueUsername()` to prevent test conflicts
+- **MANDATORY**: Call `ensureTestAdmin()` in setUp and `cleanupTestData()` in tearDown
+- **Reference**: See `.github/test.instructions.md` for complete testing guidelines and patterns
+
 ### API Testing Guidelines
 - **Use curl for endpoint testing** - prefer command-line testing over browser
 - **Test different content types**: JSON, JSON-LD, HTML, YAML
@@ -214,14 +221,18 @@ final class EntityProcessor implements ProcessorInterface
    - Use `./boot_project.sh --with-server` to start everything including Symfony server
    - Use `./shutdown_project.sh` to properly stop all services and clean up
    - For unit tests only: use `./boot_project.sh` (without --with-server option)
-3. **Use curl for API testing and URL examination** - prefer curl over browser for endpoint testing
-4. Create entities with `php bin/console make:entity`
-5. Generate migrations with `php bin/console make:migration`
-6. Configure API Platform resources with attributes in `src/ApiResource/`
-7. Implement State Providers/Processors in `src/State/` for custom logic
-8. Write tests before implementing complex logic
-9. Use `php bin/console debug:router` to verify routes
-10. Test API endpoints with built-in documentation at `/api/docs`
+3. **MANDATORY: Follow test isolation guidelines for database tests**
+   - See `.github/test.instructions.md` for complete testing requirements
+   - Use `DatabaseTestTrait` for all functional tests that interact with database
+   - Always use unique usernames and proper cleanup in tests
+4. **Use curl for API testing and URL examination** - prefer curl over browser for endpoint testing
+5. Create entities with `php bin/console make:entity`
+6. Generate migrations with `php bin/console make:migration`
+7. Configure API Platform resources with attributes in `src/ApiResource/`
+8. Implement State Providers/Processors in `src/State/` for custom logic
+9. Write tests before implementing complex logic
+10. Use `php bin/console debug:router` to verify routes
+11. Test API endpoints with built-in documentation at `/api/docs`
 
 ## Performance Tips
 - Use serialization groups to limit data transfer
