@@ -5,11 +5,11 @@ This is a Symfony 7.3 API project built with API Platform 4.2, following modern 
 
 ## Specialized Instructions
 For detailed guidance on specific areas, refer to these specialized instruction files:
-- [CQRS Architecture](instructions/cqrs.instructions.md) - Command/Query Responsibility Segregation patterns
-- [API Platform Best Practices](instructions/api-platform.instructions.md) - API Platform configuration and usage
-- [Database Design](instructions/database.instructions.md) - Database patterns and repository design
-- [Security Guidelines](instructions/security.instructions.md) - Authentication, authorization, and security practices
-- [Testing Guidelines](instructions/test.instructions.md) - Comprehensive testing patterns and requirements
+- [CQRS Architecture](cqrs.md) - Command/Query Responsibility Segregation patterns
+- [API Platform Best Practices](api-platform.md) - API Platform configuration and usage
+- [Database Design](database.md) - Database patterns and repository design
+- [Security Guidelines](security.md) - Authentication, authorization, and security practices
+- [Testing Guidelines](test.instructions.md) - Comprehensive testing patterns and requirements
 
 ## Technology Stack
 - **Framework**: Symfony 7.3
