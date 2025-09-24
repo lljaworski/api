@@ -27,6 +27,9 @@ php bin/console doctrine:database:create
 echo "Running database migrations..."
 php bin/console doctrine:migrations:migrate --no-interaction
 
+echo "Installing bundle assets..."
+php bin/console assets:install public --no-interaction
+
 if [ "$WITH_SERVER" = true ]; then
   echo "Starting Symfony development server..."
   symfony server:start -d
