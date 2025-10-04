@@ -29,7 +29,10 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(
             uriTemplate: '/users',
             security: "is_granted('ROLE_ADMIN')",
-            normalizationContext: ['groups' => ['user:read', 'user:list']]
+            normalizationContext: ['groups' => ['user:read', 'user:list']],
+            paginationEnabled: true,
+            paginationItemsPerPage: 30,
+            paginationMaximumItemsPerPage: 100
         ),
         new Get(
             uriTemplate: '/users/{id}',

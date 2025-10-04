@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use App\Application\DTO\UserCollectionDTO;
 use App\Application\DTO\UserDTO;
@@ -21,7 +23,8 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 final class UserProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly MessageBusInterface $queryBus
+        private readonly MessageBusInterface $queryBus,
+        private readonly Pagination $pagination
     ) {
     }
 
@@ -46,12 +49,14 @@ final class UserProvider implements ProviderInterface
             return $user;
         }
 
-        // Handle user collection
-        $page = (int) ($context['filters']['page'] ?? 1);
-        $itemsPerPage = (int) ($context['filters']['itemsPerPage'] ?? 30);
+        // Handle user collection - use API Platform's pagination system
+        $offset = $this->pagination->getOffset($operation, $context);
+        $limit = $this->pagination->getLimit($operation, $context);
+        $page = $this->pagination->getPage($context);
+        
         $search = $context['filters']['search'] ?? null;
         
-        $query = new GetUsersQuery($page, $itemsPerPage, $search);
+        $query = new GetUsersQuery($page, $limit, $search);
         $envelope = $this->queryBus->dispatch($query);
         $handledStamp = $envelope->last(HandledStamp::class);
         
@@ -61,7 +66,13 @@ final class UserProvider implements ProviderInterface
         // Convert DTOs back to entities for API Platform compatibility
         $users = array_map([$this, 'createUserEntityFromDTO'], $collectionDTO->users);
         
-        return $users;
+        // Return API Platform Paginator for proper Hydra collection format
+        return new TraversablePaginator(
+            new \ArrayIterator($users),
+            $offset,
+            $limit,
+            $collectionDTO->total
+        );
     }
     
     private function createUserEntityFromDTO(UserDTO $dto): User

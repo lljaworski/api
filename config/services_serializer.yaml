@@ -1,0 +1,4 @@
+services:
+    App\Serializer\JsonCollectionNormalizer:
+        tags:
+            - { name: serializer.normalizer, priority: 64 }
