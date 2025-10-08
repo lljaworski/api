@@ -35,7 +35,7 @@ class UserCrudTest extends WebTestCase
                 'CONTENT_TYPE' => 'application/json',
             ], json_encode([
                 'username' => 'admin',
-                'password' => 'admin123'
+                'password' => 'admin'
             ]));
             
             $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
