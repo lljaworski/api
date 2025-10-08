@@ -8,6 +8,54 @@
 
 **NEVER** change the admin password to `admin123` or any other value. The admin user is created in `DatabaseTestTrait` with password `'admin'` and all authentication must use these exact credentials.
 
+## HTTP Status Code Constants
+
+**CRITICAL RULE**: Always use Response constants instead of hardcoded HTTP status codes in tests.
+
+- Use `Response::HTTP_OK` instead of `200`
+- Use `Response::HTTP_CREATED` instead of `201` 
+- Use `Response::HTTP_NO_CONTENT` instead of `204`
+- Use `Response::HTTP_UNAUTHORIZED` instead of `401`
+- Use `Response::HTTP_FORBIDDEN` instead of `403`
+- Use `Response::HTTP_NOT_FOUND` instead of `404`
+- Use `Response::HTTP_UNPROCESSABLE_ENTITY` instead of `422`
+
+Always import `use Symfony\Component\HttpFoundation\Response;` at the top of test files.
+
+**Example:**
+```php
+// ❌ Wrong - hardcoded status code
+$this->assertEquals(201, $this->client->getResponse()->getStatusCode());
+
+// ✅ Correct - Response constant
+$this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
+```
+
+## HTTP Request Method Constants
+
+**CRITICAL RULE**: Always use Request constants instead of hardcoded HTTP method strings in tests.
+
+- Use `Request::METHOD_GET` instead of `'GET'`
+- Use `Request::METHOD_POST` instead of `'POST'`
+- Use `Request::METHOD_PUT` instead of `'PUT'`
+- Use `Request::METHOD_PATCH` instead of `'PATCH'`
+- Use `Request::METHOD_DELETE` instead of `'DELETE'`
+- Use `Request::METHOD_HEAD` instead of `'HEAD'`
+- Use `Request::METHOD_OPTIONS` instead of `'OPTIONS'`
+
+Always import `use Symfony\Component\HttpFoundation\Request;` at the top of test files.
+
+**Example:**
+```php
+// ❌ Wrong - hardcoded method string
+$this->client->request('GET', '/api/users');
+$this->requestAsAdmin('POST', '/api/users', [], [], $headers, $data);
+
+// ✅ Correct - Request constant
+$this->client->request(Request::METHOD_GET, '/api/users');
+$this->requestAsAdmin(Request::METHOD_POST, '/api/users', [], [], $headers, $data);
+```
+
 ## Database Test Isolation
 
 ### Mandatory: Use DatabaseTestTrait for All Database Tests

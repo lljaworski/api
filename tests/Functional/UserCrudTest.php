@@ -12,6 +12,8 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Tests\Trait\DatabaseTestTrait;
 use App\Tests\Trait\RequestTrait;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 class UserCrudTest extends WebTestCase
 {
@@ -33,15 +35,15 @@ class UserCrudTest extends WebTestCase
 
     public function testGetUsersCollectionRequiresAuth(): void
     {
-        $this->client->request('GET', '/api/users');
-        $this->assertEquals(401, $this->client->getResponse()->getStatusCode());
+        $this->client->request(Request::METHOD_GET, '/api/users');
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->client->getResponse()->getStatusCode());
     }
 
     public function testGetUsersCollectionWithAuth(): void
     {
-        $this->requestAsAdmin('GET', '/api/users');
+        $this->requestAsAdmin(Request::METHOD_GET, '/api/users');
         
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('member', $responseData);
@@ -61,11 +63,11 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_USER']
         ];
         
-        $this->requestAsAdmin('POST', '/api/users', [], [], [
+        $this->requestAsAdmin(Request::METHOD_POST, '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
-        $this->assertEquals(201, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals($username, $responseData['username']);
@@ -91,11 +93,11 @@ class UserCrudTest extends WebTestCase
             'password' => '12345', // Invalid: too short (min 6)
         ];
         
-        $this->requestAsAdmin('POST', '/api/users', [], [], [
+        $this->requestAsAdmin(Request::METHOD_POST, '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
-        $this->assertEquals(422, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $this->client->getResponse()->getStatusCode());
         
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('violations', $responseData);
@@ -111,11 +113,11 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_USER']
         ];
         
-        $this->requestAsAdmin('POST', '/api/users', [], [], [
+        $this->requestAsAdmin(Request::METHOD_POST, '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
-        $this->assertEquals(201, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         $createResponseData = json_decode($this->client->getResponse()->getContent(), true);
         $userId = $createResponseData['id'];
         
@@ -124,9 +126,9 @@ class UserCrudTest extends WebTestCase
         $this->createdEntities[] = $user;
         
         // Now get the user
-        $this->requestAsAdmin('GET', '/api/users/' . $userId);
+        $this->requestAsAdmin(Request::METHOD_GET, '/api/users/' . $userId);
         
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals($username, $responseData['username']);
@@ -145,11 +147,11 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_USER']
         ];
         
-        $this->requestAsAdmin('POST', '/api/users', [], [], [
+        $this->requestAsAdmin(Request::METHOD_POST, '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
-        $this->assertEquals(201, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         $createResponseData = json_decode($this->client->getResponse()->getContent(), true);
         $userId = $createResponseData['id'];
         
@@ -165,11 +167,11 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_ADMIN']
         ];
         
-        $this->requestAsAdmin('PUT', '/api/users/' . $userId, [], [], [
+        $this->requestAsAdmin(Request::METHOD_PUT, '/api/users/' . $userId, [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($updateData));
         
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals($newUsername, $responseData['username']);
@@ -177,14 +179,14 @@ class UserCrudTest extends WebTestCase
         $this->assertArrayNotHasKey('password', $responseData);
         
         // Verify password was updated by trying to authenticate
-        $this->client->request('POST', '/api/login_check', [], [], [
+        $this->client->request(Request::METHOD_POST, '/api/login_check', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
             'username' => $newUsername,
             'password' => 'newpassword123'
         ]));
         
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
     public function testPartialUpdateUser(): void
@@ -197,11 +199,11 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_USER']
         ];
         
-        $this->requestAsAdmin('POST', '/api/users', [], [], [
+        $this->requestAsAdmin(Request::METHOD_POST, '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
-        $this->assertEquals(201, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         $createResponseData = json_decode($this->client->getResponse()->getContent(), true);
         $userId = $createResponseData['id'];
         
@@ -214,25 +216,25 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_ADMIN']
         ];
         
-        $this->requestAsAdmin('PATCH', '/api/users/' . $userId, [], [], [
+        $this->requestAsAdmin(Request::METHOD_PATCH, '/api/users/' . $userId, [], [], [
             'CONTENT_TYPE' => 'application/merge-patch+json',
         ], json_encode($patchData));
         
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals($username, $responseData['username']); // Should remain unchanged
         $this->assertContains('ROLE_ADMIN', $responseData['roles']); // Should be updated
         
         // Verify password remains unchanged by trying to authenticate with original password
-        $this->client->request('POST', '/api/login_check', [], [], [
+        $this->client->request(Request::METHOD_POST, '/api/login_check', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
             'username' => $username,
             'password' => 'password123'
         ]));
         
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
     public function testSoftDeleteUser(): void
@@ -245,11 +247,11 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_USER']
         ];
         
-        $this->requestAsAdmin('POST', '/api/users', [], [], [
+        $this->requestAsAdmin(Request::METHOD_POST, '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
-        $this->assertEquals(201, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         $createResponseData = json_decode($this->client->getResponse()->getContent(), true);
         $userId = $createResponseData['id'];
         
@@ -258,9 +260,9 @@ class UserCrudTest extends WebTestCase
         $this->createdEntities[] = $user;
         
         // Now soft delete the user
-        $this->requestAsAdmin('DELETE', '/api/users/' . $userId);
+        $this->requestAsAdmin(Request::METHOD_DELETE, '/api/users/' . $userId);
         
-        $this->assertEquals(204, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
         
         // Verify user is soft deleted in database
         $this->entityManager->clear();
@@ -270,32 +272,32 @@ class UserCrudTest extends WebTestCase
         $this->assertNotNull($deletedUser->getDeletedAt());
         
         // Verify user is not in the collection anymore
-        $this->requestAsAdmin('GET', '/api/users');
+        $this->requestAsAdmin(Request::METHOD_GET, '/api/users');
         
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         
         $deletedUserInCollection = array_filter($responseData['member'] ?? [], fn($user) => $user['id'] === $userId);
         $this->assertEmpty($deletedUserInCollection); // Soft deleted user should not appear in collection
         
         // Verify individual user endpoint returns 404 for soft deleted user
-        $this->requestAsAdmin('GET', '/api/users/' . $userId);
+        $this->requestAsAdmin(Request::METHOD_GET, '/api/users/' . $userId);
         
-        $this->assertEquals(404, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
     }
 
     public function testDeleteNonExistentUser(): void
     {
-        $this->requestAsAdmin('DELETE', '/api/users/99999');
+        $this->requestAsAdmin(Request::METHOD_DELETE, '/api/users/99999');
         
-        $this->assertEquals(404, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
     }
 
     public function testGetNonExistentUser(): void
     {
-        $this->requestAsAdmin('GET', '/api/users/99999');
+        $this->requestAsAdmin(Request::METHOD_GET, '/api/users/99999');
         
-        $this->assertEquals(404, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
     }
 
     public function testUserOperationsRequireAdminRole(): void
@@ -324,30 +326,30 @@ class UserCrudTest extends WebTestCase
         $this->createdEntities[] = $regularUser;
         
         // Get token for regular user
-        $this->client->request('POST', '/api/login_check', [], [], [
+        $this->client->request(Request::METHOD_POST, '/api/login_check', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
             'username' => $username,
             'password' => 'password123'
         ]));
         
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $regularUserToken = $responseData['token'];
         
         // Test that regular user cannot access user operations
-        $this->client->request('GET', '/api/users', [], [], [
+        $this->client->request(Request::METHOD_GET, '/api/users', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer ' . $regularUserToken,
         ]);
         
-        $this->assertEquals(403, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
         
-        $this->client->request('POST', '/api/users', [], [], [
+        $this->client->request(Request::METHOD_POST, '/api/users', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer ' . $regularUserToken,
             'CONTENT_TYPE' => 'application/json',
         ], json_encode(['username' => 'test', 'password' => 'test123']));
         
-        $this->assertEquals(403, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
     public function testPasswordIsHashedOnCreate(): void
@@ -359,11 +361,11 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_USER']
         ];
         
-        $this->requestAsAdmin('POST', '/api/users', [], [], [
+        $this->requestAsAdmin(Request::METHOD_POST, '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
-        $this->assertEquals(201, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         
         // Verify password was hashed
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
@@ -374,14 +376,14 @@ class UserCrudTest extends WebTestCase
         $this->createdEntities[] = $user;
         
         // Verify can authenticate with original password
-        $this->client->request('POST', '/api/login_check', [], [], [
+        $this->client->request(Request::METHOD_POST, '/api/login_check', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
             'username' => $username,
             'password' => 'plainpassword123'
         ]));
         
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
     protected function tearDown(): void
