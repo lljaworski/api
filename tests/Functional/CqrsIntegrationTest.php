@@ -9,7 +9,7 @@ use App\Application\Command\User\DeleteUserCommand;
 use App\Application\Command\User\UpdateUserCommand;
 use App\Application\Query\User\GetUserQuery;
 use App\Application\Query\User\GetUsersQuery;
-use App\Tests\Functional\DatabaseTestTrait;
+use App\Tests\Trait\DatabaseTestTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
