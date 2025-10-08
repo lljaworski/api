@@ -56,6 +56,64 @@ $this->client->request(Request::METHOD_GET, '/api/users');
 $this->requestAsAdmin(Request::METHOD_POST, '/api/users', [], [], $headers, $data);
 ```
 
+## Test-Driven Development (TDD) Process
+
+**CRITICAL RULE**: Always follow the TDD Red-Green-Refactor cycle when implementing new functionality.
+
+### TDD Workflow:
+1. **RED**: Write a failing test first
+   - Create a test that describes the desired functionality
+   - Run the test to ensure it fails (red)
+   - The failure should be meaningful and specific
+
+2. **GREEN**: Write minimal code to make the test pass
+   - Implement only enough code to make the test pass
+   - Don't worry about perfect code quality yet
+   - Focus on making the test green as quickly as possible
+
+3. **REFACTOR**: Improve the code while keeping tests green
+   - Clean up the implementation
+   - Improve code structure, naming, and design
+   - Ensure all tests still pass after refactoring
+
+4. **FINAL CONFIRMATION**: Run all tests
+   - Execute the complete test suite to ensure no regressions
+   - All tests must pass before considering the feature complete
+
+### TDD Benefits:
+- Ensures comprehensive test coverage
+- Drives better API design
+- Prevents over-engineering
+- Provides immediate feedback on code changes
+- Creates living documentation through tests
+
+### Example TDD Workflow:
+```php
+// 1. RED: Write failing test
+public function testUserCanBeCreatedWithValidData(): void
+{
+    $userData = ['username' => 'testuser', 'password' => 'password123'];
+    
+    $this->requestAsAdmin(Request::METHOD_POST, '/api/users', [], [], [
+        'CONTENT_TYPE' => 'application/json',
+    ], json_encode($userData));
+    
+    $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
+    // Test fails because endpoint doesn't exist yet
+}
+
+// 2. GREEN: Implement minimal solution
+// Create API endpoint, entity, etc. to make test pass
+
+// 3. REFACTOR: Improve code quality
+// Clean up implementation, add validation, improve structure
+
+// 4. FINAL: Run all tests to ensure no regressions
+// ./vendor/bin/phpunit
+```
+
+**Remember**: Never write production code without a failing test first!
+
 ## Database Test Isolation
 
 ### Mandatory: Use DatabaseTestTrait for All Database Tests
