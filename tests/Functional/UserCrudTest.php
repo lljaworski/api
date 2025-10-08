@@ -10,10 +10,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Tests\Trait\DatabaseTestTrait;
+use App\Tests\Trait\RequestTrait;
 
 class UserCrudTest extends WebTestCase
 {
     use DatabaseTestTrait;
+    use RequestTrait;
     
     private KernelBrowser $client;
     private EntityManagerInterface $entityManager;
@@ -28,24 +31,6 @@ class UserCrudTest extends WebTestCase
         $this->ensureTestAdmin();
     }
 
-    private function getAuthToken(): string
-    {
-        if ($this->adminToken === null) {
-            $this->client->request('POST', '/api/login_check', [], [], [
-                'CONTENT_TYPE' => 'application/json',
-            ], json_encode([
-                'username' => 'admin',
-                'password' => 'admin'
-            ]));
-            
-            $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-            $responseData = json_decode($this->client->getResponse()->getContent(), true);
-            $this->adminToken = $responseData['token'];
-        }
-        
-        return $this->adminToken;
-    }
-
     public function testGetUsersCollectionRequiresAuth(): void
     {
         $this->client->request('GET', '/api/users');
@@ -54,11 +39,7 @@ class UserCrudTest extends WebTestCase
 
     public function testGetUsersCollectionWithAuth(): void
     {
-        $token = $this->getAuthToken();
-        
-        $this->client->request('GET', '/api/users', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-        ]);
+        $this->requestAsAdmin('GET', '/api/users');
         
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
         
@@ -73,8 +54,6 @@ class UserCrudTest extends WebTestCase
 
     public function testCreateUser(): void
     {
-        $token = $this->getAuthToken();
-        
         $username = $this->generateUniqueUsername('newuser');
         $userData = [
             'username' => $username,
@@ -82,8 +61,7 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_USER']
         ];
         
-        $this->client->request('POST', '/api/users', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        $this->requestAsAdmin('POST', '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
@@ -108,15 +86,12 @@ class UserCrudTest extends WebTestCase
 
     public function testCreateUserWithInvalidData(): void
     {
-        $token = $this->getAuthToken();
-        
         $userData = [
             'username' => 'ab', // Invalid: too short (min 3)
             'password' => '12345', // Invalid: too short (min 6)
         ];
         
-        $this->client->request('POST', '/api/users', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        $this->requestAsAdmin('POST', '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
@@ -128,8 +103,6 @@ class UserCrudTest extends WebTestCase
 
     public function testGetSingleUser(): void
     {
-        $token = $this->getAuthToken();
-        
         // First create a user
         $username = $this->generateUniqueUsername('getuser');
         $userData = [
@@ -138,8 +111,7 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_USER']
         ];
         
-        $this->client->request('POST', '/api/users', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        $this->requestAsAdmin('POST', '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
@@ -152,9 +124,7 @@ class UserCrudTest extends WebTestCase
         $this->createdEntities[] = $user;
         
         // Now get the user
-        $this->client->request('GET', '/api/users/' . $userId, [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-        ]);
+        $this->requestAsAdmin('GET', '/api/users/' . $userId);
         
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
         
@@ -167,8 +137,6 @@ class UserCrudTest extends WebTestCase
 
     public function testUpdateUser(): void
     {
-        $token = $this->getAuthToken();
-        
         // First create a user
         $username = $this->generateUniqueUsername('updateuser');
         $userData = [
@@ -177,8 +145,7 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_USER']
         ];
         
-        $this->client->request('POST', '/api/users', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        $this->requestAsAdmin('POST', '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
@@ -198,8 +165,7 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_ADMIN']
         ];
         
-        $this->client->request('PUT', '/api/users/' . $userId, [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        $this->requestAsAdmin('PUT', '/api/users/' . $userId, [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($updateData));
         
@@ -223,8 +189,6 @@ class UserCrudTest extends WebTestCase
 
     public function testPartialUpdateUser(): void
     {
-        $token = $this->getAuthToken();
-        
         // First create a user
         $username = $this->generateUniqueUsername('patchuser');
         $userData = [
@@ -233,8 +197,7 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_USER']
         ];
         
-        $this->client->request('POST', '/api/users', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        $this->requestAsAdmin('POST', '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
@@ -251,8 +214,7 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_ADMIN']
         ];
         
-        $this->client->request('PATCH', '/api/users/' . $userId, [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        $this->requestAsAdmin('PATCH', '/api/users/' . $userId, [], [], [
             'CONTENT_TYPE' => 'application/merge-patch+json',
         ], json_encode($patchData));
         
@@ -275,8 +237,6 @@ class UserCrudTest extends WebTestCase
 
     public function testSoftDeleteUser(): void
     {
-        $token = $this->getAuthToken();
-        
         // First create a user
         $username = $this->generateUniqueUsername('deleteuser');
         $userData = [
@@ -285,8 +245,7 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_USER']
         ];
         
-        $this->client->request('POST', '/api/users', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        $this->requestAsAdmin('POST', '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
@@ -299,9 +258,7 @@ class UserCrudTest extends WebTestCase
         $this->createdEntities[] = $user;
         
         // Now soft delete the user
-        $this->client->request('DELETE', '/api/users/' . $userId, [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-        ]);
+        $this->requestAsAdmin('DELETE', '/api/users/' . $userId);
         
         $this->assertEquals(204, $this->client->getResponse()->getStatusCode());
         
@@ -313,9 +270,7 @@ class UserCrudTest extends WebTestCase
         $this->assertNotNull($deletedUser->getDeletedAt());
         
         // Verify user is not in the collection anymore
-        $this->client->request('GET', '/api/users', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-        ]);
+        $this->requestAsAdmin('GET', '/api/users');
         
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
@@ -324,31 +279,21 @@ class UserCrudTest extends WebTestCase
         $this->assertEmpty($deletedUserInCollection); // Soft deleted user should not appear in collection
         
         // Verify individual user endpoint returns 404 for soft deleted user
-        $this->client->request('GET', '/api/users/' . $userId, [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-        ]);
+        $this->requestAsAdmin('GET', '/api/users/' . $userId);
         
         $this->assertEquals(404, $this->client->getResponse()->getStatusCode());
     }
 
     public function testDeleteNonExistentUser(): void
     {
-        $token = $this->getAuthToken();
-        
-        $this->client->request('DELETE', '/api/users/99999', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-        ]);
+        $this->requestAsAdmin('DELETE', '/api/users/99999');
         
         $this->assertEquals(404, $this->client->getResponse()->getStatusCode());
     }
 
     public function testGetNonExistentUser(): void
     {
-        $token = $this->getAuthToken();
-        
-        $this->client->request('GET', '/api/users/99999', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-        ]);
+        $this->requestAsAdmin('GET', '/api/users/99999');
         
         $this->assertEquals(404, $this->client->getResponse()->getStatusCode());
     }
@@ -407,8 +352,6 @@ class UserCrudTest extends WebTestCase
 
     public function testPasswordIsHashedOnCreate(): void
     {
-        $token = $this->getAuthToken();
-        
         $username = $this->generateUniqueUsername('hashtest');
         $userData = [
             'username' => $username,
@@ -416,8 +359,7 @@ class UserCrudTest extends WebTestCase
             'roles' => ['ROLE_USER']
         ];
         
-        $this->client->request('POST', '/api/users', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        $this->requestAsAdmin('POST', '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         

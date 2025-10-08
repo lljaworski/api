@@ -1,5 +1,13 @@
 # Test Instructions for API Platform Project
 
+## Admin Credentials
+
+**CRITICAL RULE**: Admin user credentials for testing are:
+- Username: `admin`
+- Password: `admin`
+
+**NEVER** change the admin password to `admin123` or any other value. The admin user is created in `DatabaseTestTrait` with password `'admin'` and all authentication must use these exact credentials.
+
 ## Database Test Isolation
 
 ### Mandatory: Use DatabaseTestTrait for All Database Tests
