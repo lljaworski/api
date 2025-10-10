@@ -34,7 +34,7 @@ class JWTTokenTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
             'username' => 'admin',
-            'password' => 'admin'
+            'password' => 'admin123!'
         ]));
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());

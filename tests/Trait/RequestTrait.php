@@ -22,7 +22,7 @@ Trait RequestTrait
                 'CONTENT_TYPE' => 'application/json',
             ], json_encode([
                 'username' => 'admin',
-                'password' => 'admin'
+                'password' => 'admin123!'
             ]));
             
             $this->assertEquals(200, $this->client->getResponse()->getStatusCode());

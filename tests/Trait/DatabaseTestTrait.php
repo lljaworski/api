@@ -34,9 +34,9 @@ trait DatabaseTestTrait
         $entityManager = $this->entityManager ?? static::getContainer()->get(EntityManagerInterface::class);
         $passwordHasher = static::getContainer()->get(UserPasswordHasherInterface::class);
         
-        $admin = new User('admin', 'admin');
+        $admin = new User('admin', 'admin123!');
         $admin->setRoles(['ROLE_ADMIN']);
-        $hashedPassword = $passwordHasher->hashPassword($admin, 'admin');
+        $hashedPassword = $passwordHasher->hashPassword($admin, 'admin123!');
         $admin->setPassword($hashedPassword);
         
         $entityManager->persist($admin);

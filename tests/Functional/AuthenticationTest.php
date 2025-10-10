@@ -33,7 +33,7 @@ class AuthenticationTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
             'username' => 'admin',
-            'password' => 'admin'
+            'password' => 'admin123!'
         ]));
 
         $response = $this->client->getResponse();
@@ -109,7 +109,7 @@ class AuthenticationTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
             'username' => 'admin',
-            'password' => 'admin'
+            'password' => 'admin123!'
         ]));
 
         $loginResponse = $this->client->getResponse();
@@ -204,7 +204,7 @@ class AuthenticationTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
             'username' => 'admin',
-            'password' => 'admin'
+            'password' => 'admin123!'
         ]));
 
         $response = $this->client->getResponse();
