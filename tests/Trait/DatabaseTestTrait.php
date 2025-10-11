@@ -18,10 +18,15 @@ trait DatabaseTestTrait
     {
         $entityManager = $this->entityManager ?? static::getContainer()->get(EntityManagerInterface::class);
         $userRepository = $entityManager->getRepository(User::class);
+        $passwordHasher = static::getContainer()->get(UserPasswordHasherInterface::class);
         
         // Check if admin already exists
         $existingAdmin = $userRepository->findOneBy(['username' => 'admin']);
         if ($existingAdmin) {
+            // Ensure the admin has the correct password for testing
+            $hashedPassword = $passwordHasher->hashPassword($existingAdmin, 'admin123!');
+            $existingAdmin->setPassword($hashedPassword);
+            $entityManager->flush();
             return $existingAdmin;
         }
         
@@ -34,9 +39,9 @@ trait DatabaseTestTrait
         $entityManager = $this->entityManager ?? static::getContainer()->get(EntityManagerInterface::class);
         $passwordHasher = static::getContainer()->get(UserPasswordHasherInterface::class);
         
-        $admin = new User('admin', 'admin');
+        $admin = new User('admin', 'admin123!');
         $admin->setRoles(['ROLE_ADMIN']);
-        $hashedPassword = $passwordHasher->hashPassword($admin, 'admin');
+        $hashedPassword = $passwordHasher->hashPassword($admin, 'admin123!');
         $admin->setPassword($hashedPassword);
         
         $entityManager->persist($admin);

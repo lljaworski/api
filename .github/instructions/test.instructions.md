@@ -4,9 +4,9 @@
 
 **CRITICAL RULE**: Admin user credentials for testing are:
 - Username: `admin`
-- Password: `admin`
+- Password: `admin123!`
 
-**NEVER** change the admin password to `admin123` or any other value. The admin user is created in `DatabaseTestTrait` with password `'admin'` and all authentication must use these exact credentials.
+**NEVER** change the admin password to `admin` or any other value. The admin user is created in `DatabaseTestTrait` with password `'admin123!'` and all authentication must use these exact credentials.
 
 ## HTTP Status Code Constants
 

@@ -39,11 +39,12 @@ Accept: application/json
 
 ## Available Dictionaries
 
-### Roles Dictionary
-- **Endpoint**: `GET /api/dictionaries/roles`
-- **Source**: `App\Enum\RolesEnum`
-- **Required Role**: `ROLE_ADMIN`
-- **Description**: User roles available in the system
+### Admin Credentials
+- **Username**: `admin`
+- **Password**: `admin123!`
+- **Roles**: `ROLE_ADMIN`, `ROLE_USER`
+
+⚠️ **Important**: Change these default credentials in production environments!
 
 ## Architecture
 
@@ -226,7 +227,7 @@ public function testRolesDictionaryRequiresAdminRole(): void
 ```bash
 # Get authentication token
 TOKEN=$(curl -s -X POST -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin"}' \
+  -d '{"username":"admin","password":"admin123!"}' \
   http://localhost:8000/api/login_check | jq -r .token)
 
 # Test roles dictionary

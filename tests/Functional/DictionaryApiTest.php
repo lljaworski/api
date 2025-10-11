@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional;
 
 use App\Tests\Trait\DatabaseTestTrait;
+use App\Tests\Trait\RequestTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -14,9 +15,11 @@ use Symfony\Component\HttpFoundation\Response;
 class DictionaryApiTest extends WebTestCase
 {
     use DatabaseTestTrait;
+    use RequestTrait;
 
     private KernelBrowser $client;
     private EntityManagerInterface $entityManager;
+    private ?string $adminToken = null;
 
     protected function setUp(): void
     {
@@ -49,7 +52,7 @@ class DictionaryApiTest extends WebTestCase
         $this->createTestUser($username, 'password123', ['ROLE_USER']);
         
         // Get token for regular user
-        $token = $this->getAuthToken($username, 'password123');
+        $token = $this->getAuthTokenForUser($username, 'password123');
         
         // Regular user should not have access to roles dictionary
         $this->client->request(Request::METHOD_GET, '/api/dictionaries/roles', [], [], [
@@ -62,12 +65,8 @@ class DictionaryApiTest extends WebTestCase
 
     public function testAdminCanAccessRolesDictionary(): void
     {
-        // Get admin token
-        $token = $this->getAuthToken('admin', 'admin');
-        
         // Admin should have access to roles dictionary
-        $this->client->request(Request::METHOD_GET, '/api/dictionaries/roles', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        $this->requestAsAdmin(Request::METHOD_GET, '/api/dictionaries/roles', [], [], [
             'HTTP_ACCEPT' => 'application/json',
         ]);
         
@@ -103,12 +102,8 @@ class DictionaryApiTest extends WebTestCase
 
     public function testNonExistentDictionaryReturns404(): void
     {
-        // Get admin token
-        $token = $this->getAuthToken('admin', 'admin');
-        
         // Request non-existent dictionary
-        $this->client->request(Request::METHOD_GET, '/api/dictionaries/nonexistent', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        $this->requestAsAdmin(Request::METHOD_GET, '/api/dictionaries/nonexistent', [], [], [
             'HTTP_ACCEPT' => 'application/json',
         ]);
         
@@ -117,12 +112,8 @@ class DictionaryApiTest extends WebTestCase
 
     public function testDictionaryEndpointAcceptsOnlyValidTypeFormat(): void
     {
-        // Get admin token
-        $token = $this->getAuthToken('admin', 'admin');
-        
         // Test invalid type format (with special characters that should be rejected by regex)
-        $this->client->request(Request::METHOD_GET, '/api/dictionaries/invalid-type-with-dashes', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+        $this->requestAsAdmin(Request::METHOD_GET, '/api/dictionaries/invalid-type-with-dashes', [], [], [
             'HTTP_ACCEPT' => 'application/json',
         ]);
         
@@ -130,7 +121,7 @@ class DictionaryApiTest extends WebTestCase
         $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
     }
 
-    private function getAuthToken(string $username = 'admin', string $password = 'admin'): string
+    private function getAuthTokenForUser(string $username, string $password): string
     {
         $this->client->request(Request::METHOD_POST, '/api/login_check', [], [], [
             'CONTENT_TYPE' => 'application/json',
