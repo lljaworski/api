@@ -21,7 +21,7 @@ final class Version20250920184300 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // Use a working bcrypt hash for 'admin123!' password
-        $hashedPassword = '$2y$10$9Y8rJ2YkFqMv8L5uK0vYs.gJ8Q7QfvFzYzgGx8KjJ5ZJ5tE6Q2VGy'; // admin123!
+        $hashedPassword = '$2y$04$iQkG9BSfz0mnhv/vFH0Dze.bRhdHMv0/zYoeByOpftITb/ZRQeY.e'; // admin123!
         
         $this->addSql('INSERT INTO users (username, password, roles) VALUES (?, ?, ?)', [
             'admin',
