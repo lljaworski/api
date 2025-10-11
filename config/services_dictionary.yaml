@@ -1,0 +1,9 @@
+services:
+    # Roles dictionary provider using RolesEnum
+    app.dictionary.provider.roles:
+        class: App\Dictionary\Provider\EnumDictionaryProvider
+        arguments:
+            $type: 'roles'
+            $enumClass: 'App\Enum\RolesEnum'
+
+    # Dictionary Registry is configured via compiler pass (see DictionaryProviderPass)
