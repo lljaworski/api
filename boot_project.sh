@@ -267,7 +267,7 @@ if [ "$WITH_SERVER" = true ]; then
   echo ""
   log_info "🚀 Your API is now running!"
   log_info "📋 API Documentation: http://127.0.0.1:8000/api/docs"
-  log_info "🔑 Test login endpoint: curl -X POST http://127.0.0.1:8000/api/login_check -H 'Content-Type: application/json' -d '{\"username\":\"admin\",\"password\":\"admin123\"}'"
+  log_info "🔑 Test login endpoint: curl -X POST http://127.0.0.1:8000/api/login_check -H 'Content-Type: application/json' -d '{\"username\":\"admin\",\"password\":\"admin123!\"}'"
 else
   echo ""
   log_info "✅ Project is ready for development"
