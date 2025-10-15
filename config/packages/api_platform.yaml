@@ -6,6 +6,11 @@ api_platform:
         json:   ['application/json']
         html:   ['text/html']
         yaml:   ['application/vnd.openapi+yaml']
+    docs_formats:
+        jsonld: ['application/ld+json']
+        json:   ['application/json']
+        html:   ['text/html']
+        yaml:   ['application/vnd.openapi+yaml']
     defaults:
         stateless: true
         cache_headers:
