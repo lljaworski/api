@@ -26,7 +26,7 @@ final class Version20250920184300 extends AbstractMigration
         $this->addSql('INSERT INTO users (username, password, roles) VALUES (?, ?, ?)', [
             'admin',
             $hashedPassword,
-            '["ROLE_ADMIN", "ROLE_USER"]'
+            '["ROLE_ADMIN", "ROLE_USER", "ROLE_B2B"]'
         ]);
     }
 
