@@ -142,6 +142,10 @@ curl -X POST -H "Content-Type: application/json" \
   - `./boot_project.sh` for unit tests (database only, no server)
   - `./boot_project.sh --with-server` for integration/functional tests
   - `./shutdown_project.sh` to clean up after testing
+- **CRITICAL**: Follow custom serialization format in tests:
+  - For `application/json`: Use `$responseData['pagination']['total']` not `$responseData['hydra:totalItems']`
+  - For `application/ld+json`: Use standard Hydra format `$responseData['hydra:totalItems']`
+  - See `.github/instructions/test.instructions.md` for complete testing guidelines
 
 ## Project Management Scripts
 - **`./boot_project.sh`**: Starts Docker services, database, and migrations
@@ -233,6 +237,7 @@ final class EntityProcessor implements ProcessorInterface
    - See `.github/test.instructions.md` for complete testing requirements
    - Use `DatabaseTestTrait` for all functional tests that interact with database
    - Always use unique usernames and proper cleanup in tests
+   - **CRITICAL**: Use custom serialization format in collection tests: `$responseData['pagination']['total']` not `$responseData['hydra:totalItems']`
 4. **Use curl for API testing and URL examination** - prefer curl over browser for endpoint testing
 5. Create entities with `php bin/console make:entity`
 6. Generate migrations with `php bin/console make:migration`

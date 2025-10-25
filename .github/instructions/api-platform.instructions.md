@@ -160,11 +160,58 @@ Authorization: Bearer {jwt_token}
 5. **Use pagination parameters** for collection endpoints (`page`, `itemsPerPage`)
 6. **Implement proper error handling** for all status codes
 
+## Custom Serialization Format
+
+### Collection Response Format (JSON)
+**IMPORTANT**: This project uses a custom collection serialization format for `application/json` requests. The `JsonCollectionNormalizer` (located in `src/Serializer/JsonCollectionNormalizer.php`) transforms API Platform's standard Hydra format into a custom format.
+
+#### Standard API Platform Hydra Format (application/ld+json):
+```json
+{
+  "@context": "/api/contexts/Resource",
+  "@id": "/api/resources",
+  "@type": "hydra:Collection",
+  "hydra:member": [...],
+  "hydra:totalItems": 15,
+  "hydra:view": {...}
+}
+```
+
+#### Custom JSON Format (application/json):
+```json
+{
+  "data": [...],
+  "pagination": {
+    "total": 15.0,
+    "count": 15,
+    "currentPage": 0.0,
+    "itemsPerPage": 30.0,
+    "totalPages": 1
+  }
+}
+```
+
+### Testing Guidelines for Custom Serialization
+**CRITICAL**: When writing tests for collection endpoints, always expect the custom format:
+
+```php
+// ✅ Correct - Test for custom format
+$responseData = json_decode($this->client->getResponse()->getContent(), true);
+$this->assertGreaterThan(0, $responseData['pagination']['total'] ?? 0);
+$this->assertIsArray($responseData['data']);
+
+// ❌ Wrong - Don't test for Hydra format in JSON responses
+$this->assertGreaterThan(0, $responseData['hydra:totalItems'] ?? 0);
+```
+
+### Single Item Responses
+Single item responses maintain standard API Platform format for all content types.
+
 ## Content Negotiation
 
 Supported formats:
-- `application/json` (default)
-- `application/ld+json` (JSON-LD)
+- `application/json` (default) - **Uses custom collection format**
+- `application/ld+json` (JSON-LD) - **Uses standard Hydra format**
 - `text/html` (API documentation)
 - `application/yaml`
 

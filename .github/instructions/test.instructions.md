@@ -255,6 +255,41 @@ After implementing tests with `DatabaseTestTrait`, verify isolation:
 php bin/console doctrine:query:sql "SELECT username FROM users"
 ```
 
+### Custom Serialization Format Testing
+
+**CRITICAL RULE**: This project uses custom serialization for collection responses when requesting `application/json`. Tests must be written to expect this format.
+
+#### Collection Response Testing
+```php
+// ✅ Correct - Test for custom pagination format
+$this->client->request(Request::METHOD_GET, '/api/resources', [], [], [
+    'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+    'HTTP_ACCEPT' => 'application/json'  // This triggers custom format
+]);
+
+$responseData = json_decode($this->client->getResponse()->getContent(), true);
+$this->assertGreaterThan(0, $responseData['pagination']['total'] ?? 0);
+$this->assertIsArray($responseData['data']);
+$this->assertEquals(30, $responseData['pagination']['itemsPerPage']);
+
+// ❌ Wrong - Don't test for Hydra format in JSON responses
+$this->assertGreaterThan(0, $responseData['hydra:totalItems'] ?? 0);
+$this->assertArrayHasKey('hydra:member', $responseData);
+```
+
+#### Standard Hydra Format Testing (JSON-LD)
+```php
+// For JSON-LD format, use standard Hydra format expectations
+$this->client->request(Request::METHOD_GET, '/api/resources', [], [], [
+    'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+    'HTTP_ACCEPT' => 'application/ld+json'  // This uses standard Hydra format
+]);
+
+$responseData = json_decode($this->client->getResponse()->getContent(), true);
+$this->assertGreaterThan(0, $responseData['hydra:totalItems'] ?? 0);
+$this->assertArrayHasKey('hydra:member', $responseData);
+```
+
 ### Error Prevention
 
 #### Common Issue: Duplicate Entry Violations
@@ -280,6 +315,18 @@ $this->createTestAdmin();
 
 // ✅ Correct - ensures admin exists without duplicates
 $this->ensureTestAdmin();
+```
+
+#### Common Issue: Wrong Collection Response Format
+**Problem**: `Failed asserting that 0 is greater than 0` when testing `$responseData['hydra:totalItems']`
+
+**Solution**: Use the correct response format for the content type:
+```php
+// ❌ Wrong - Testing for Hydra format in JSON response
+$this->assertGreaterThan(0, $responseData['hydra:totalItems'] ?? 0);
+
+// ✅ Correct - Testing for custom pagination format in JSON response
+$this->assertGreaterThan(0, $responseData['pagination']['total'] ?? 0);
 ```
 
 ### File Reference
