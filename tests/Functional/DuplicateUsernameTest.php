@@ -55,15 +55,35 @@ class DuplicateUsernameTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
         
-        // Should return 422 or 409 with a meaningful error message
         $statusCode = $this->client->getResponse()->getStatusCode();
         $responseContent = $this->client->getResponse()->getContent();
         
-        echo "\nStatus code: $statusCode\n";
-        echo "Response: $responseContent\n\n";
+        echo "\nStatus Code: $statusCode\n";
+        echo "Response: $responseContent\n";
         
-        // For now, just check what the actual behavior is
-        $this->assertNotEquals(Response::HTTP_CREATED, $statusCode, 'Should not create duplicate user');
+        // Should return 422 Unprocessable Entity with a meaningful error message
+        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $statusCode);
+        
+        $responseData = json_decode($responseContent, true);
+        
+        // Check for violations array (API Platform's standard validation error format)
+        $this->assertArrayHasKey('violations', $responseData);
+        $this->assertNotEmpty($responseData['violations']);
+        
+        // Check that the error message mentions the username is already taken
+        $violationMessages = array_column($responseData['violations'], 'message');
+        $hasUsernameError = false;
+        foreach ($violationMessages as $message) {
+            if (stripos($message, 'username') !== false && 
+                (stripos($message, 'taken') !== false || 
+                 stripos($message, 'exists') !== false || 
+                 stripos($message, 'already') !== false)) {
+                $hasUsernameError = true;
+                break;
+            }
+        }
+        
+        $this->assertTrue($hasUsernameError, 'Error message should indicate username is already taken');
     }
 
     protected function tearDown(): void
