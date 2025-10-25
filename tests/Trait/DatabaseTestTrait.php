@@ -75,6 +75,13 @@ trait DatabaseTestTrait
         $entityManager = $this->entityManager ?? static::getContainer()->get(EntityManagerInterface::class);
         
         try {
+            // Remove all companies (test data)
+            $companyRepository = $entityManager->getRepository(\App\Entity\Company::class);
+            $companies = $companyRepository->findAll();
+            foreach ($companies as $company) {
+                $entityManager->remove($company);
+            }
+            
             // Remove all users except admin
             $userRepository = $entityManager->getRepository(User::class);
             $testUsers = $userRepository->createQueryBuilder('u')

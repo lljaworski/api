@@ -41,7 +41,10 @@ abstract class AbstractCqrsProvider implements ProviderInterface
         $offset = $this->pagination->getOffset($operation, $context);
         $limit = $this->pagination->getLimit($operation, $context);
         $page = $this->pagination->getPage($context);
-        $search = $context['filters']['search'] ?? null;
+        
+        // API Platform SearchFilter creates filters with property names
+        // For now, we'll use 'name' filter as the main search parameter
+        $search = $context['filters']['name'] ?? null;
         
         $query = $this->createCollectionQuery($page, $limit, $search);
         $envelope = $this->queryBus->dispatch($query);

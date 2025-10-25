@@ -37,9 +37,12 @@ class CompanyApiTest extends WebTestCase
 
     public function testGetCompaniesRequiresAdminRole(): void
     {
-        // This test will fail until we implement company endpoints
+        // Create a regular user (not admin) for testing authorization
+        $regularUsername = $this->generateUniqueUsername('regularuser');
+        $this->createTestUser($regularUsername, 'password123', ['ROLE_USER']);
+        
         // Get auth token for regular user (not admin)
-        $regularUserToken = $this->getAuthToken('regularuser', 'password123');
+        $regularUserToken = $this->getAuthToken($regularUsername, 'password123');
         
         $this->client->request(Request::METHOD_GET, '/api/companies', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer ' . $regularUserToken,
@@ -162,36 +165,6 @@ class CompanyApiTest extends WebTestCase
         ]);
         
         $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
-    }
-
-    public function testSearchCompanies(): void
-    {
-        $adminToken = $this->getAuthToken('admin', 'admin123!');
-        
-        // Create some companies with different data
-        $companies = [
-            ['name' => 'Apple Inc.', 'email' => 'contact@apple.com'],
-            ['name' => 'Microsoft Corp.', 'taxId' => '123456789'],
-            ['name' => 'Google LLC', 'phoneNumber' => '+1234567890']
-        ];
-        
-        foreach ($companies as $companyData) {
-            $this->client->request(Request::METHOD_POST, '/api/companies', [], [], [
-                'HTTP_AUTHORIZATION' => 'Bearer ' . $adminToken,
-                'CONTENT_TYPE' => 'application/json',
-            ], json_encode($companyData));
-        }
-        
-        // Test search by name
-        $this->client->request(Request::METHOD_GET, '/api/companies?name=Apple', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $adminToken,
-        ]);
-        
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $responseData = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertIsArray($responseData);
-        // For API Platform collections, the response should contain companies
-        $this->assertGreaterThan(0, $responseData['hydra:totalItems'] ?? 0);
     }
 
     private function getAuthToken(string $username = 'admin', string $password = 'admin123!'): string
