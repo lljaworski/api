@@ -13,6 +13,13 @@ use App\Tests\Trait\RequestTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Tests for duplicate username validation.
+ * 
+ * This test ensures that when a user attempts to create a new user with a username
+ * that already exists in the database, the API returns a proper validation error
+ * (422 Unprocessable Entity) with a clear message, instead of a database exception (500).
+ */
 class DuplicateUsernameTest extends WebTestCase
 {
     use DatabaseTestTrait;
@@ -30,6 +37,15 @@ class DuplicateUsernameTest extends WebTestCase
         $this->ensureTestAdmin();
     }
 
+    /**
+     * Test that creating a user with a duplicate username returns a proper validation error.
+     * 
+     * Expected behavior:
+     * - First user creation succeeds (201 Created)
+     * - Second user creation with same username fails (422 Unprocessable Entity)
+     * - Error response contains a clear message about the username being taken
+     * - Error follows API Platform's standard ConstraintViolation format
+     */
     public function testCreateUserWithDuplicateUsername(): void
     {
         $username = $this->generateUniqueUsername('dupuser');
@@ -39,7 +55,7 @@ class DuplicateUsernameTest extends WebTestCase
             'roles' => ['ROLE_USER']
         ];
         
-        // Create first user
+        // Create first user - should succeed
         $this->requestAsAdmin(Request::METHOD_POST, '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
@@ -50,7 +66,7 @@ class DuplicateUsernameTest extends WebTestCase
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
         $this->createdEntities[] = $user;
         
-        // Try to create duplicate user
+        // Try to create duplicate user - should fail with validation error
         $this->requestAsAdmin(Request::METHOD_POST, '/api/users', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($userData));
@@ -58,10 +74,7 @@ class DuplicateUsernameTest extends WebTestCase
         $statusCode = $this->client->getResponse()->getStatusCode();
         $responseContent = $this->client->getResponse()->getContent();
         
-        echo "\nStatus Code: $statusCode\n";
-        echo "Response: $responseContent\n";
-        
-        // Should return 422 Unprocessable Entity with a meaningful error message
+        // Should return 422 Unprocessable Entity (not 500 Internal Server Error)
         $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $statusCode);
         
         $responseData = json_decode($responseContent, true);
@@ -70,20 +83,17 @@ class DuplicateUsernameTest extends WebTestCase
         $this->assertArrayHasKey('violations', $responseData);
         $this->assertNotEmpty($responseData['violations']);
         
-        // Check that the error message mentions the username is already taken
-        $violationMessages = array_column($responseData['violations'], 'message');
-        $hasUsernameError = false;
-        foreach ($violationMessages as $message) {
-            if (stripos($message, 'username') !== false && 
-                (stripos($message, 'taken') !== false || 
-                 stripos($message, 'exists') !== false || 
-                 stripos($message, 'already') !== false)) {
-                $hasUsernameError = true;
-                break;
-            }
-        }
+        // Verify the error is about username
+        $this->assertArrayHasKey('propertyPath', $responseData['violations'][0]);
+        $this->assertEquals('username', $responseData['violations'][0]['propertyPath']);
         
-        $this->assertTrue($hasUsernameError, 'Error message should indicate username is already taken');
+        // Verify the exact error message
+        $this->assertEquals('This username is already taken.', $responseData['violations'][0]['message']);
+        
+        // Verify response has correct structure
+        $this->assertArrayHasKey('@type', $responseData);
+        $this->assertEquals('ConstraintViolation', $responseData['@type']);
+        $this->assertEquals(422, $responseData['status']);
     }
 
     protected function tearDown(): void
