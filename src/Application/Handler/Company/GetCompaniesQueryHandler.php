@@ -57,8 +57,6 @@ final class GetCompaniesQueryHandler
             otherIdCountryCode: $company->getOtherIdCountryCode(),
             otherIdNumber: $company->getOtherIdNumber(),
             noIdMarker: $company->getNoIdMarker(),
-            internalId: $company->getInternalId(),
-            buyerId: $company->getBuyerId(),
             clientNumber: $company->getClientNumber(),
             countryCode: $company->getCountryCode(),
             addressLine1: $company->getAddressLine1(),

@@ -61,8 +61,6 @@ final class EntityFromDtoFactory
             'otherIdCountryCode' => 'setOtherIdCountryCode',
             'otherIdNumber' => 'setOtherIdNumber',
             'noIdMarker' => 'setNoIdMarker',
-            'internalId' => 'setInternalId',
-            'buyerId' => 'setBuyerId',
             'clientNumber' => 'setClientNumber',
             'countryCode' => 'setCountryCode',
             'addressLine1' => 'setAddressLine1',

@@ -58,12 +58,6 @@ final class UpdateCompanyCommandHandler
         if ($command->noIdMarker !== null) {
             $company->setNoIdMarker($command->noIdMarker);
         }
-        if ($command->internalId !== null) {
-            $company->setInternalId($command->internalId);
-        }
-        if ($command->buyerId !== null) {
-            $company->setBuyerId($command->buyerId);
-        }
         if ($command->clientNumber !== null) {
             $company->setClientNumber($command->clientNumber);
         }

@@ -20,8 +20,6 @@ final class CompanyDTO
         public readonly ?string $otherIdCountryCode,
         public readonly ?string $otherIdNumber,
         public readonly ?bool $noIdMarker,
-        public readonly ?string $internalId,
-        public readonly ?string $buyerId,
         public readonly ?string $clientNumber,
         public readonly ?string $countryCode,
         public readonly ?string $addressLine1,

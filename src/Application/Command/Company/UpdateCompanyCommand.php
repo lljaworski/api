@@ -44,12 +44,6 @@ final class UpdateCompanyCommand extends AbstractCommand
         public readonly ?bool $noIdMarker = null,
         
         #[Assert\Length(max: 50)]
-        public readonly ?string $internalId = null,
-        
-        #[Assert\Length(max: 50)]
-        public readonly ?string $buyerId = null,
-        
-        #[Assert\Length(max: 50)]
         public readonly ?string $clientNumber = null,
         
         #[Assert\Length(max: 4)]

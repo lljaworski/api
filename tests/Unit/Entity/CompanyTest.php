@@ -35,8 +35,6 @@ class CompanyTest extends TestCase
         $company->setOtherIdCountryCode('US');
         $company->setOtherIdNumber('US123456789');
         $company->setNoIdMarker(false);
-        $company->setInternalId('INT123');
-        $company->setBuyerId('BUY123');
         $company->setClientNumber('CLI123');
         $company->setCountryCode('PL');
         $company->setAddressLine1('Test Street 123');
@@ -65,8 +63,6 @@ class CompanyTest extends TestCase
         $this->assertEquals('US', $company->getOtherIdCountryCode());
         $this->assertEquals('US123456789', $company->getOtherIdNumber());
         $this->assertFalse($company->getNoIdMarker());
-        $this->assertEquals('INT123', $company->getInternalId());
-        $this->assertEquals('BUY123', $company->getBuyerId());
         $this->assertEquals('CLI123', $company->getClientNumber());
         $this->assertEquals('PL', $company->getCountryCode());
         $this->assertEquals('Test Street 123', $company->getAddressLine1());

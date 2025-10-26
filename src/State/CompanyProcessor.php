@@ -53,8 +53,6 @@ final class CompanyProcessor implements ProcessorInterface
                 otherIdCountryCode: $this->extractUpdatedOtherIdCountryCode($data, $context),
                 otherIdNumber: $this->extractUpdatedOtherIdNumber($data, $context),
                 noIdMarker: $this->extractUpdatedNoIdMarker($data, $context),
-                internalId: $this->extractUpdatedInternalId($data, $context),
-                buyerId: $this->extractUpdatedBuyerId($data, $context),
                 clientNumber: $this->extractUpdatedClientNumber($data, $context),
                 countryCode: $this->extractUpdatedCountryCode($data, $context),
                 addressLine1: $this->extractUpdatedAddressLine1($data, $context),
@@ -91,8 +89,6 @@ final class CompanyProcessor implements ProcessorInterface
                 otherIdCountryCode: $data->getOtherIdCountryCode(),
                 otherIdNumber: $data->getOtherIdNumber(),
                 noIdMarker: $data->getNoIdMarker(),
-                internalId: $data->getInternalId(),
-                buyerId: $data->getBuyerId(),
                 clientNumber: $data->getClientNumber(),
                 countryCode: $data->getCountryCode(),
                 addressLine1: $data->getAddressLine1(),
@@ -164,16 +160,6 @@ final class CompanyProcessor implements ProcessorInterface
     private function extractUpdatedNoIdMarker(Company $data, array $context): ?bool
     {
         return $this->isFieldInRequest('noIdMarker', $context) ? $data->getNoIdMarker() : null;
-    }
-
-    private function extractUpdatedInternalId(Company $data, array $context): ?string
-    {
-        return $this->isFieldInRequest('internalId', $context) ? $data->getInternalId() : null;
-    }
-
-    private function extractUpdatedBuyerId(Company $data, array $context): ?string
-    {
-        return $this->isFieldInRequest('buyerId', $context) ? $data->getBuyerId() : null;
     }
 
     private function extractUpdatedClientNumber(Company $data, array $context): ?string

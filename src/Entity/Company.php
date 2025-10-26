@@ -125,16 +125,6 @@ class Company
     #[ORM\Column(length: 50, nullable: true)]
     #[Assert\Length(max: 50, groups: ['company:create', 'company:update'])]
     #[Groups(['company:read', 'company:details', 'company:create', 'company:update'])]
-    private ?string $internalId = null;
-
-    #[ORM\Column(length: 50, nullable: true)]
-    #[Assert\Length(max: 50, groups: ['company:create', 'company:update'])]
-    #[Groups(['company:read', 'company:details', 'company:create', 'company:update'])]
-    private ?string $buyerId = null;
-
-    #[ORM\Column(length: 50, nullable: true)]
-    #[Assert\Length(max: 50, groups: ['company:create', 'company:update'])]
-    #[Groups(['company:read', 'company:details', 'company:create', 'company:update'])]
     private ?string $clientNumber = null;
 
     // Address Fields
@@ -357,30 +347,6 @@ class Company
     public function setNoIdMarker(?bool $noIdMarker): static
     {
         $this->noIdMarker = $noIdMarker;
-        $this->touch();
-        return $this;
-    }
-
-    public function getInternalId(): ?string
-    {
-        return $this->internalId;
-    }
-
-    public function setInternalId(?string $internalId): static
-    {
-        $this->internalId = $internalId;
-        $this->touch();
-        return $this;
-    }
-
-    public function getBuyerId(): ?string
-    {
-        return $this->buyerId;
-    }
-
-    public function setBuyerId(?string $buyerId): static
-    {
-        $this->buyerId = $buyerId;
         $this->touch();
         return $this;
     }

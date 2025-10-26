@@ -37,8 +37,6 @@ class CompanyCommandTest extends TestCase
             otherIdCountryCode: 'US',
             otherIdNumber: 'US123456789',
             noIdMarker: false,
-            internalId: 'INT123',
-            buyerId: 'BUY123',
             clientNumber: 'CLI123',
             countryCode: 'PL',
             addressLine1: 'Test Street 123',

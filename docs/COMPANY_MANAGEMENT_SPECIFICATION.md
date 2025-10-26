@@ -95,8 +95,6 @@ The specification is intended for developers implementing the Company entity wit
 - `other_id_country_code` - Other ID country (max 4 chars, nullable)
 - `other_id_number` - Other ID number (max 50 chars, nullable)
 - `no_id_marker` - No ID marker (boolean, nullable)
-- `internal_id` - Internal KSeF ID (max 50 chars, nullable)
-- `buyer_id` - Buyer ID (max 50 chars, nullable)
 - `client_number` - Client number (max 50 chars, nullable)
 
 ### Address Fields
