@@ -197,25 +197,6 @@ class Company
     #[Groups(['company:read', 'company:details', 'company:create', 'company:update'])]
     private ?int $gvMarker = null;
 
-    #[ORM\Column(nullable: true)]
-    #[Assert\Choice(choices: [1, 2, 4, 6, 11], groups: ['company:create', 'company:update'])]
-    #[Groups(['company:read', 'company:details', 'company:create', 'company:update'])]
-    private ?int $role = null;
-
-    #[ORM\Column(nullable: true)]
-    #[Groups(['company:read', 'company:details', 'company:create', 'company:update'])]
-    private ?bool $otherRoleMarker = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\Length(max: 255, groups: ['company:create', 'company:update'])]
-    #[Groups(['company:read', 'company:details', 'company:create', 'company:update'])]
-    private ?string $roleDescription = null;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
-    #[Assert\Range(min: 0, max: 100, groups: ['company:create', 'company:update'])]
-    #[Groups(['company:read', 'company:details', 'company:create', 'company:update'])]
-    private ?float $sharePercentage = null;
-
     // Audit Fields
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     #[Groups(['company:read', 'company:details'])]
@@ -515,54 +496,6 @@ class Company
     public function setGvMarker(?int $gvMarker): static
     {
         $this->gvMarker = $gvMarker;
-        $this->touch();
-        return $this;
-    }
-
-    public function getRole(): ?int
-    {
-        return $this->role;
-    }
-
-    public function setRole(?int $role): static
-    {
-        $this->role = $role;
-        $this->touch();
-        return $this;
-    }
-
-    public function getOtherRoleMarker(): ?bool
-    {
-        return $this->otherRoleMarker;
-    }
-
-    public function setOtherRoleMarker(?bool $otherRoleMarker): static
-    {
-        $this->otherRoleMarker = $otherRoleMarker;
-        $this->touch();
-        return $this;
-    }
-
-    public function getRoleDescription(): ?string
-    {
-        return $this->roleDescription;
-    }
-
-    public function setRoleDescription(?string $roleDescription): static
-    {
-        $this->roleDescription = $roleDescription;
-        $this->touch();
-        return $this;
-    }
-
-    public function getSharePercentage(): ?float
-    {
-        return $this->sharePercentage;
-    }
-
-    public function setSharePercentage(?float $sharePercentage): static
-    {
-        $this->sharePercentage = $sharePercentage;
         $this->touch();
         return $this;
     }
