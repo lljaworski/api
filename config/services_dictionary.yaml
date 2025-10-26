@@ -6,4 +6,11 @@ services:
             $type: 'roles'
             $enumClass: 'App\Enum\RolesEnum'
 
+    # Tax Status dictionary provider using TaxStatusEnum
+    app.dictionary.provider.tax_status:
+        class: App\Dictionary\Provider\EnumDictionaryProvider
+        arguments:
+            $type: 'tax_status'
+            $enumClass: 'App\Enum\TaxStatusEnum'
+
     # Dictionary Registry is configured via compiler pass (see DictionaryProviderPass)
