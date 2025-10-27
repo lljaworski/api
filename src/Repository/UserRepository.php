@@ -146,4 +146,30 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+    /**
+     * Count inactive (soft deleted) users
+     */
+    public function countInactiveUsers(): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->andWhere('u.deletedAt IS NOT NULL')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Count users by specific role
+     */
+    public function countUsersByRole(string $role): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->andWhere('u.deletedAt IS NULL')
+            ->andWhere('u.roles LIKE :role')
+            ->setParameter('role', '%"' . $role . '"%')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }
