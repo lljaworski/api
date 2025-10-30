@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\State;
 
 use App\Application\DTO\CompanyDTO;
+use App\Application\DTO\InvoiceDTO;
 use App\Application\DTO\UserDTO;
 use App\Entity\Company;
+use App\Entity\Invoice;
 use App\Entity\User;
 
 /**
@@ -112,6 +114,68 @@ final class EntityFromDtoFactory
         }
         
         return $company;
+    }
+    
+    /**
+     * Creates an Invoice entity from InvoiceDTO with all properties set via reflection.
+     */
+    public static function createInvoiceFromDTO(InvoiceDTO $dto): Invoice
+    {
+        $invoice = new Invoice();
+        
+        // Use reflection to set private properties
+        $reflection = new \ReflectionClass($invoice);
+        
+        self::setPrivateProperty($reflection, $invoice, 'id', $dto->id);
+        
+        // Set all properties using public setters where available
+        $invoice->setNumber($dto->number);
+        $invoice->setIssueDate($dto->issueDate);
+        $invoice->setSaleDate($dto->saleDate);
+        $invoice->setCurrency($dto->currency);
+        $invoice->setSubtotal($dto->subtotal);
+        $invoice->setVatAmount($dto->vatAmount);
+        $invoice->setTotal($dto->total);
+        $invoice->setIsPaid($dto->isPaid);
+        
+        // Set optional properties
+        if ($dto->dueDate !== null) {
+            $invoice->setDueDate($dto->dueDate);
+        }
+        if ($dto->paymentMethod !== null) {
+            $invoice->setPaymentMethod($dto->paymentMethod);
+        }
+        if ($dto->notes !== null) {
+            $invoice->setNotes($dto->notes);
+        }
+        if ($dto->paidAt !== null) {
+            $invoice->setPaidAt($dto->paidAt);
+        }
+        if ($dto->ksefNumber !== null) {
+            $invoice->setKsefNumber($dto->ksefNumber);
+        }
+        if ($dto->ksefSubmittedAt !== null) {
+            $invoice->setKsefSubmittedAt($dto->ksefSubmittedAt);
+        }
+        
+        // Set status using reflection (no public setter that bypasses validation)
+        self::setPrivateProperty($reflection, $invoice, 'status', $dto->status);
+        
+        // Set audit fields
+        self::setPrivateProperty($reflection, $invoice, 'createdAt', $dto->createdAt);
+        self::setPrivateProperty($reflection, $invoice, 'updatedAt', $dto->updatedAt);
+        
+        if ($dto->deletedAt !== null) {
+            self::setPrivateProperty($reflection, $invoice, 'deletedAt', $dto->deletedAt);
+        }
+        
+        // Set customer relationship (assuming the DTO has customer data)
+        if ($dto->customer !== null) {
+            $customer = self::createCompanyFromDTO($dto->customer);
+            $invoice->setCustomer($customer);
+        }
+        
+        return $invoice;
     }
     
     /**

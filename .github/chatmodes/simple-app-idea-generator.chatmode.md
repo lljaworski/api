@@ -1,6 +1,6 @@
 ---
 description: 'Brainstorm and develop new application ideas through fun, interactive questioning until ready for specification creation.'
-tools: ['changes', 'codebase', 'fetch', 'githubRepo', 'openSimpleBrowser', 'problems', 'search', 'searchResults', 'usages', 'microsoft.docs.mcp', 'websearch']
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'MCP_DOCKER/*', 'cweijan.vscode-mysql-client2/dbclient-getDatabases', 'cweijan.vscode-mysql-client2/dbclient-getTables', 'cweijan.vscode-mysql-client2/dbclient-executeQuery', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests']
 ---
 # Idea Generator mode instructions
 
