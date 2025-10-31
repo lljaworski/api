@@ -210,16 +210,21 @@ class InvoiceRepository extends ServiceEntityRepository
      */
     public function getNextSequenceNumber(\DateTimeInterface $date): int
     {
-        $year = $date->format('Y');
-        $month = $date->format('m');
+        $year = (int) $date->format('Y');
+        $month = (int) $date->format('m');
+        
+        // Create date range for the month
+        $startDate = new \DateTime(sprintf('%d-%02d-01', $year, $month));
+        $endDate = clone $startDate;
+        $endDate->modify('last day of this month')->setTime(23, 59, 59);
         
         $result = $this->createQueryBuilder('i')
             ->select('COUNT(i.id) + 1')
             ->andWhere('i.deletedAt IS NULL')
-            ->andWhere('YEAR(i.issueDate) = :year')
-            ->andWhere('MONTH(i.issueDate) = :month')
-            ->setParameter('year', $year)
-            ->setParameter('month', $month)
+            ->andWhere('i.issueDate >= :startDate')
+            ->andWhere('i.issueDate <= :endDate')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
             ->getQuery()
             ->getSingleScalarResult();
 
