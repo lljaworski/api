@@ -1,0 +1,6 @@
+ceidg:
+    # CEIDG API base URL
+    api_url: '%env(CEIDG_API_URL)%'
+    
+    # CEIDG API key (required)
+    api_key: '%env(CEIDG_API_KEY)%'

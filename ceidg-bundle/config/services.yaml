@@ -1,0 +1,19 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    # Make services available for autowiring
+    LukaszJaworski\CeidgBundle\Service\:
+        resource: '../src/Service/*'
+
+    LukaszJaworski\CeidgBundle\Command\:
+        resource: '../src/Command/*'
+        tags: ['console.command']
+
+    LukaszJaworski\CeidgBundle\State\:
+        resource: '../src/State/*'
+
+    LukaszJaworski\CeidgBundle\Repository\:
+        resource: '../src/Repository/*'
