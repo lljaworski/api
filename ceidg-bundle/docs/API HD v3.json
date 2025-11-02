@@ -1,0 +1,1296 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "OpenAPI definition",
+        "version": "v1"
+    },
+    "paths": {
+        "/zmiana": {
+            "get": {
+                "tags": [
+                    "Resource"
+                ],
+                "parameters": [
+                    {
+                        "name": "requestData",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/ZmianaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ZmianaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BladApi"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/firma": {
+            "get": {
+                "tags": [
+                    "Resource"
+                ],
+                "parameters": [
+                    {
+                        "name": "requestData",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/FirmaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FirmaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BladApi"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/firma/{id}": {
+            "get": {
+                "tags": [
+                    "Resource"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FirmaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BladApi"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/firmy": {
+            "get": {
+                "tags": [
+                    "Resource"
+                ],
+                "parameters": [
+                    {
+                        "name": "firmyRequest",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/FirmyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FirmyResponse"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BladApi"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    },
+                    "503": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BladApi"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/raporty": {
+            "get": {
+                "tags": [
+                    "Resource"
+                ],
+                "parameters": [
+                    {
+                        "name": "raportyRequest",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/RaportyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RaportyResponse"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BladApi"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    },
+                    "503": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BladApi"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/raport/{id}": {
+            "get": {
+                "description": "Zwraca wybrany raport skompresowany ZIP",
+                "operationId": "raport",
+                "parameters": [
+                    {
+                        "description": "Identyfikator",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/octet-stream": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "Raport"
+                    },
+                    "204": {
+                        "description": "Brak wyników"
+                    },
+                    "400": {
+                        "content": {
+                            "application/octet-stream": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BladApi"
+                                }
+                            }
+                        },
+                        "description": "Niepoprawnie skonstruowane zapytanie"
+                    },
+                    "401": {
+                        "description": "Brak autoryzacji"
+                    },
+                    "403": {
+                        "description": "Brak uprawnień"
+                    },
+                    "404": {
+                        "description": "Zasób nie istnieje"
+                    },
+                    "500": {
+                        "description": "Wewnętrzny błąd serwera"
+                    },
+                    "503": {
+                        "content": {
+                            "application/octet-stream": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BladApi"
+                                }
+                            }
+                        },
+                        "description": "Serwis niedostępny"
+                    }
+                },
+                "tags": [
+                    "Resource"
+                ]
+            }
+        }
+        
+    },
+    "components": {
+        "schemas": {
+            "Adres": {
+                "type": "object",
+                "properties": {
+                    "ulica": {
+                        "type": "string"
+                    },
+                    "budynek": {
+                        "type": "string"
+                    },
+                    "lokal": {
+                        "type": "string"
+                    },
+                    "miasto": {
+                        "type": "string"
+                    },
+                    "wojewodztwo": {
+                        "type": "string"
+                    },
+                    "powiat": {
+                        "type": "string"
+                    },
+                    "gmina": {
+                        "type": "string"
+                    },
+                    "kraj": {
+                        "type": "string"
+                    },
+                    "kod": {
+                        "type": "string"
+                    },
+                    "skrytkaPocztowa": {
+                        "type": "string"
+                    },
+                    "opisNietypowegoMiejsca": {
+                        "type": "string"
+                    },
+                    "adresat": {
+                        "type": "string"
+                    },
+                    "terc": {
+                        "type": "string"
+                    },
+                    "simc": {
+                        "type": "string"
+                    },
+                    "ulic": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "BladApi": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/KodBledu"
+                            }
+                        ]
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "DaneRaportu": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "nazwa": {
+                        "type": "string"
+                    },
+                    "format": {
+                        "type": "string"
+                    },
+                    "raport": {
+                        "type": "string"
+                    },
+                    "dataUtworzenia": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "FirmaCeidg": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "nazwa": {
+                        "type": "string"
+                    },
+                    "adresDzialalnosci": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Adres"
+                            }
+                        ]
+                    },
+                    "adresyDzialalnosciDodatkowe": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Adres"
+                        }
+                    },
+                    "adresKorespondencyjny": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Adres"
+                            }
+                        ]
+                    },
+                    "wlasciciel": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Osoba"
+                            }
+                        ]
+                    },
+                    "obywatelstwa": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Obywatelstwo"
+                        }
+                    },
+                    "rokPkd": {
+						"type": "string"
+					},
+					"pkd": {
+						"type": "array",
+						"items": {
+						  "$ref": "#/components/schemas/PkdSzczegoly"
+						}
+					},
+					"pkdGlowny": {
+						"allOf": [
+						  {
+							"$ref": "#/components/schemas/PkdSzczegoly"
+						  }
+						]
+					},
+                    "spolki": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Spolka"
+                        }
+                    },
+                    "dataRozpoczecia": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "dataZawieszenia": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "dataZakonczenia": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "dataWykreslenia": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "dataWznowienia": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Status"
+                            }
+                        ]
+                    },
+                    "numerStatusu": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "telefon": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "www": {
+                        "type": "string"
+                    },
+                    "adresDoreczenElektronicznych": {
+                        "type": "string"
+                    },
+                    "innaFormaKonaktu": {
+                        "type": "string"
+                    },
+                    "wspolnoscMajatkowa": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "wspolnoscMajatkowaDataUstania": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "dataZgonu": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "zarzadSukcesyjnyDataUstanowienia": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "zarzadSukcesyjnyDataWygasniecia": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "podstawyPrawneWykreslenia": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "zakazy": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Zakaz"
+                        }
+                    },
+                    "upadlosci": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Upadlosc"
+                        }
+                    },
+                    "zarzadcaSukcesyjny": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Sukcesja"
+                            }
+                        ]
+                    },
+                    "kwalifikacjeZawodowe": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/KwalifikacjaZawodowa"
+                        }
+                    },
+                    "uprawnienia": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Uprawnienie"
+                        }
+                    },
+                    "ograniczenia": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Ograniczenie"
+                        }
+                    },
+                    "ograniczeniaZdolnosciPrawnej": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Kurator"
+                        }
+                    },
+                    "link": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "FirmaRequest": {
+                "type": "object",
+                "properties": {
+                    "ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "nip": {
+                        "type": "string"
+                    },
+                    "regon": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "FirmaResponse": {
+                "type": "object",
+                "properties": {
+                    "firma": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FirmaCeidg"
+                        }
+                    },
+                    "properties": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Metadata"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "FirmyRequest": {
+                "type": "object",
+                "properties": {
+                    "nip_sc": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "regon_sc": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "kod": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "datado": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "regon": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "gmina": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "pkd": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "nazwa": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "dataod": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "budynek": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "imie": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "ulica": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "nip": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "nazwisko": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "lokal": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "wojewodztwo": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "powiat": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "miasto": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "status": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "additionalProperties": false
+            },
+            "FirmyResponse": {
+                "type": "object",
+                "properties": {
+                    "firmy": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FirmaCeidg"
+                        }
+                    },
+                    "count": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "links": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Nawigacja"
+                            }
+                        ]
+                    },
+                    "properties": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Metadata"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "KodBledu": {
+                "enum": [
+                    "NIEPOPRAWNY_ZAKRES_DAT",
+                    "NIEPOPRAWNY_NUMER_NIP",
+                    "NIEPOPRAWNY_NUMER_NIP_SC",
+                    "NIEPOPRAWNY_NUMER_STRONY",
+                    "NIEPOPRAWNY_ROZMIAR_STRONY",
+                    "NIEPOPRAWNY_KOD_POCZTOWY",
+                    "NIEPOPRAWNY_NUMER_REGON",
+                    "NIEPOPRAWNY_NUMER_REGON_SC",
+                    "BRAK_PARAMETROW_ZAPYTANIA",
+                    "NIEPOPRAWNA_LISTA_PARAMETROW",
+                    "NIEDOZWOLONE_POLE_SORTOWANIA",
+                    "NIEPOPRAWNA_ILOSC_IDENTYFIKATOROW",
+                    "BRAK_IDENTYFIKATORA",
+                    "NIEPOPRAWNY_STATUS",
+                    "NIEDOZWOLONE_POLE",
+                    "NIECZYTELNY_IDENTYFIKATOR"
+                ],
+                "type": "string",
+                "format": "int32"
+            },
+            "Kurator": {
+                "type": "object",
+                "properties": {
+                    "ustanowienieKuratora": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "trybRestrykcji": {
+                        "type": "string"
+                    },
+                    "dataRestrykcji": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "wprowadzonePrzez": {
+                        "type": "string"
+                    },
+                    "imie": {
+                        "type": "string"
+                    },
+                    "nazwisko": {
+                        "type": "string"
+                    },
+                    "nip": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "KwalifikacjaZawodowa": {
+                "type": "object",
+                "properties": {
+                    "dataEgzaminu": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "dataUniewaznienia": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "rodzajKwalifikacji": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "zawod": {
+                        "type": "string"
+                    },
+                    "wydanyPrzez": {
+                        "type": "string"
+                    },
+                    "symbolZawodu": {
+                        "type": "string"
+                    },
+                    "wprowadzonyPrzez": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Metadata": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "language": {
+                        "type": "string"
+                    },
+                    "rights": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    },
+                    "provider": {
+                        "type": "string"
+                    },
+                    "datePublished": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "dateModified": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "expires": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "keywords": {
+                        "type": "string"
+                    },
+                    "temporalCoverage": {
+                        "type": "string"
+                    },
+                    "contentType": {
+                        "type": "string"
+                    },
+                    "isPartOf": {
+                        "type": "string"
+                    },
+                    "updateFrequency": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Nawigacja": {
+                "type": "object",
+                "properties": {
+                    "next": {
+                        "type": "string"
+                    },
+                    "prev": {
+                        "type": "string"
+                    },
+                    "self": {
+                        "type": "string"
+                    },
+                    "first": {
+                        "type": "string"
+                    },
+                    "last": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Obywatelstwo": {
+                "type": "object",
+                "properties": {
+                    "symbol": {
+                        "type": "string"
+                    },
+                    "kraj": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Ograniczenie": {
+                "type": "object",
+                "properties": {
+                    "dataOd": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "dataDo": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "nazwa": {
+                        "type": "string"
+                    },
+                    "opis": {
+                        "type": "string"
+                    },
+                    "wprowadzonePrzez": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Osoba": {
+                "type": "object",
+                "properties": {
+                    "imie": {
+                        "type": "string"
+                    },
+                    "nazwisko": {
+                        "type": "string"
+                    },
+                    "nip": {
+                        "type": "string"
+                    },
+                    "nipUchylony": {
+                        "type": "boolean"
+                    },
+                    "nipUniewaznienie": {
+                        "type": "boolean"
+                    },
+                    "regon": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+			"PkdSzczegoly": {
+				"type": "object",
+				"properties": {
+				  "kod": {
+					"type": "string"
+				  },
+				  "nazwa": {
+					"type": "string"
+				  }
+				},
+				"additionalProperties": false
+			},
+            "RaportyRequest": {
+                "type": "object",
+                "properties": {
+                    "datado": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "dataod": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "RaportyResponse": {
+                "type": "object",
+                "properties": {
+                    "raporty": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DaneRaportu"
+                        }
+                    },
+                    "properties": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Metadata"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Spolka": {
+                "type": "object",
+                "properties": {
+                    "nip": {
+                        "type": "string"
+                    },
+                    "regon": {
+                        "type": "string"
+                    },
+                    "dataZawieszenia": {
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Status": {
+                "enum": [
+                    "AKTYWNY",
+                    "WYKRESLONY",
+                    "ZAWIESZONY",
+                    "OCZEKUJE_NA_ROZPOCZECIE_DZIALANOSCI",
+                    "WYLACZNIE_W_FORMIE_SPOLKI"
+                ],
+                "type": "string",
+                "format": "int32"
+            },
+            "Sukcesja": {
+                "type": "object",
+                "properties": {
+                    "dataUstanowienia": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "imie": {
+                        "type": "string"
+                    },
+                    "nazwisko": {
+                        "type": "string"
+                    },
+                    "nip": {
+                        "type": "string"
+                    },
+                    "obywatelstwa": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Obywatelstwo"
+                        }
+                    },
+                    "adresKorespondencyjny": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Adres"
+                            }
+                        ]
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "www": {
+                        "type": "string"
+                    },
+                    "telefon": {
+                        "type": "string"
+                    },
+                    "adresDoreczenElektronicznych": {
+                        "type": "string"
+                    },
+                    "innaFormaKonaktu": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "TypBledu": {
+                "enum": [
+                    "Error204",
+                    "Error400",
+                    "Error403",
+                    "Error503"
+                ],
+                "type": "string",
+                "format": "int32"
+            },
+            "Upadlosc": {
+                "type": "object",
+                "properties": {
+                    "rodzajInformacji": {
+                        "type": "string"
+                    },
+                    "dataOrzeczenia": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "imie": {
+                        "type": "string"
+                    },
+                    "naziwsko": {
+                        "type": "string"
+                    },
+                    "nip": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Uprawnienie": {
+                "type": "object",
+                "properties": {
+                    "dataOd": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "dataDo": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "nazwa": {
+                        "type": "string"
+                    },
+                    "opis": {
+                        "type": "string"
+                    },
+                    "wprowadzonePrzez": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Zakaz": {
+                "type": "object",
+                "properties": {
+                    "typ": {
+                        "type": "string"
+                    },
+                    "opis": {
+                        "type": "string"
+                    },
+                    "okres": {
+                        "type": "string"
+                    },
+                    "dataWydania": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "dataUprawomocnienia": {
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ZmianaRequest": {
+                "type": "object",
+                "properties": {
+                    "dataod": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "datado": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ZmianaResponse": {
+                "type": "object",
+                "properties": {
+                    "identyfikatoryWpisow": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    "count": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "links": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Nawigacja"
+                            }
+                        ]
+                    },
+                    "properties": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Metadata"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ZrodloDanych": {
+                "enum": [
+                    "CEIDG"
+                ],
+                "type": "string",
+                "format": "int32"
+            }
+        }
+    }
+    ,
+    "servers": [
+        {
+            "description": "Generated server url",
+            "url": "https://dane.biznes.gov.pl/api/ceidg/v3/"
+        }
+    ]
+}
