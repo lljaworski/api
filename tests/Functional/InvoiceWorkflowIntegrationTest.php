@@ -43,14 +43,13 @@ class InvoiceWorkflowIntegrationTest extends WebTestCase
         
         // Step 1: Create a draft invoice
         $invoiceData = [
-            'number' => 'WF/LIFECYCLE/001',
             'issueDate' => '2024-01-01',
             'saleDate' => '2024-01-01',
             'dueDate' => '2024-01-31',
             'currency' => 'PLN',
             'paymentMethod' => 1,
             'notes' => 'Lifecycle test invoice',
-            'customer' => $this->testCustomer->getId(),
+            'customer' => $this->getCustomerIri(),
             'items' => [
                 [
                     'description' => 'Software License',
@@ -172,21 +171,18 @@ class InvoiceWorkflowIntegrationTest extends WebTestCase
         // Create multiple invoices with different properties
         $invoicesData = [
             [
-                'number' => 'FILTER/PLN/001',
                 'issueDate' => '2024-01-15',
                 'saleDate' => '2024-01-15',
                 'currency' => 'PLN',
                 'notes' => 'Polish invoice'
             ],
             [
-                'number' => 'FILTER/EUR/001',
                 'issueDate' => '2024-02-15',
                 'saleDate' => '2024-02-15',
                 'currency' => 'EUR',
                 'notes' => 'European invoice'
             ],
             [
-                'number' => 'FILTER/USD/001',
                 'issueDate' => '2024-03-15',
                 'saleDate' => '2024-03-15',
                 'currency' => 'USD',
@@ -198,7 +194,7 @@ class InvoiceWorkflowIntegrationTest extends WebTestCase
         
         foreach ($invoicesData as $data) {
             $invoiceData = array_merge($data, [
-                'customer' => $this->testCustomer->getId(),
+                'customer' => $this->getCustomerIri(),
                 'items' => [
                     [
                         'description' => 'Test Product',
@@ -221,8 +217,8 @@ class InvoiceWorkflowIntegrationTest extends WebTestCase
             $createdInvoiceIds[] = $response['id'];
         }
         
-        // Test filtering by number (partial match)
-        $this->client->request(Request::METHOD_GET, '/api/invoices?number=FILTER/PLN', [], [], [
+        // Test filtering by currency
+        $this->client->request(Request::METHOD_GET, '/api/invoices?currency=PLN', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer ' . $adminToken,
             'HTTP_ACCEPT' => 'application/json'
         ]);
@@ -232,10 +228,10 @@ class InvoiceWorkflowIntegrationTest extends WebTestCase
         
         $this->assertGreaterThanOrEqual(1, count($filterResponse['data']));
         
-        // Verify that the filtered invoice contains PLN in the number
+        // Verify that the filtered invoice has PLN currency
         $found = false;
         foreach ($filterResponse['data'] as $invoice) {
-            if (str_contains($invoice['number'], 'PLN')) {
+            if ($invoice['currency'] === 'PLN') {
                 $found = true;
                 break;
             }
@@ -282,11 +278,10 @@ class InvoiceWorkflowIntegrationTest extends WebTestCase
         
         // Create invoice with mixed VAT rates
         $invoiceData = [
-            'number' => 'VAT/MIX/001',
             'issueDate' => '2024-01-01',
             'saleDate' => '2024-01-01',
             'currency' => 'PLN',
-            'customer' => $this->testCustomer->getId(),
+            'customer' => $this->getCustomerIri(),
             'items' => [
                 [
                     'description' => 'Books (0% VAT)',
@@ -369,11 +364,10 @@ class InvoiceWorkflowIntegrationTest extends WebTestCase
         // Create multiple invoices for pagination testing
         for ($i = 1; $i <= 15; $i++) {
             $invoiceData = [
-                'number' => sprintf('PAGE/%03d/2024', $i),
                 'issueDate' => '2024-01-' . str_pad((string)$i, 2, '0', STR_PAD_LEFT),
                 'saleDate' => '2024-01-' . str_pad((string)$i, 2, '0', STR_PAD_LEFT),
                 'currency' => 'PLN',
-                'customer' => $this->testCustomer->getId(),
+                'customer' => $this->getCustomerIri(),
                 'items' => [
                     [
                         'description' => "Product {$i}",
@@ -432,15 +426,12 @@ class InvoiceWorkflowIntegrationTest extends WebTestCase
         // Create invoices with searchable content
         $searchableInvoices = [
             [
-                'number' => 'SEARCH/SOFTWARE/001',
                 'notes' => 'Software development services'
             ],
             [
-                'number' => 'SEARCH/HARDWARE/001', 
                 'notes' => 'Hardware maintenance contract'
             ],
             [
-                'number' => 'SEARCH/CONSULTING/001',
                 'notes' => 'Business consulting services'
             ]
         ];
@@ -450,7 +441,7 @@ class InvoiceWorkflowIntegrationTest extends WebTestCase
                 'issueDate' => '2024-01-01',
                 'saleDate' => '2024-01-01',
                 'currency' => 'PLN',
-                'customer' => $this->testCustomer->getId(),
+                'customer' => $this->getCustomerIri(),
                 'items' => [
                     [
                         'description' => 'Test Product',
@@ -471,8 +462,8 @@ class InvoiceWorkflowIntegrationTest extends WebTestCase
             $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         }
         
-        // Test search by invoice number
-        $this->client->request(Request::METHOD_GET, '/api/invoices?number=SOFTWARE', [], [], [
+        // Test search by notes content
+        $this->client->request(Request::METHOD_GET, '/api/invoices?search=Software', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer ' . $adminToken,
             'HTTP_ACCEPT' => 'application/json'
         ]);
@@ -485,7 +476,7 @@ class InvoiceWorkflowIntegrationTest extends WebTestCase
         // Verify search result contains the expected invoice
         $foundSoftware = false;
         foreach ($searchResponse['data'] as $invoice) {
-            if (str_contains($invoice['number'], 'SOFTWARE')) {
+            if (str_contains($invoice['notes'], 'Software')) {
                 $foundSoftware = true;
                 break;
             }
@@ -561,5 +552,10 @@ class InvoiceWorkflowIntegrationTest extends WebTestCase
         
         // Business logic: draft and cancelled invoices can be deleted
         return in_array($invoice['status'], ['draft', 'cancelled']);
+    }
+
+    private function getCustomerIri(): string
+    {
+        return '/api/companies/' . $this->testCustomer->getId();
     }
 }

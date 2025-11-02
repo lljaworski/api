@@ -57,6 +57,7 @@ class InvoiceRepository extends ServiceEntityRepository
             ->addSelect('items')
             ->andWhere('i.deletedAt IS NULL')
             ->orderBy('i.createdAt', 'DESC')
+            ->addOrderBy('i.id', 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
@@ -65,7 +66,8 @@ class InvoiceRepository extends ServiceEntityRepository
                 $qb->expr()->like('i.number', ':search'),
                 $qb->expr()->like('c.name', ':search'),
                 $qb->expr()->like('c.taxId', ':search'),
-                $qb->expr()->like('i.notes', ':search')
+                $qb->expr()->like('i.notes', ':search'),
+                $qb->expr()->like('items.description', ':search')
             ))
             ->setParameter('search', '%' . $search . '%');
         }
@@ -110,8 +112,9 @@ class InvoiceRepository extends ServiceEntityRepository
         ?\DateTimeInterface $issueDateTo = null
     ): int {
         $qb = $this->createQueryBuilder('i')
-            ->select('COUNT(i.id)')
+            ->select('COUNT(DISTINCT i.id)')
             ->leftJoin('i.customer', 'c')
+            ->leftJoin('i.items', 'items')
             ->andWhere('i.deletedAt IS NULL');
 
         if ($search !== null && $search !== '') {
@@ -119,7 +122,8 @@ class InvoiceRepository extends ServiceEntityRepository
                 $qb->expr()->like('i.number', ':search'),
                 $qb->expr()->like('c.name', ':search'),
                 $qb->expr()->like('c.taxId', ':search'),
-                $qb->expr()->like('i.notes', ':search')
+                $qb->expr()->like('i.notes', ':search'),
+                $qb->expr()->like('items.description', ':search')
             ))
             ->setParameter('search', '%' . $search . '%');
         }

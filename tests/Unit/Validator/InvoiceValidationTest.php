@@ -40,20 +40,19 @@ class InvoiceValidationTest extends KernelTestCase
     {
         $invoice = $this->createValidInvoice();
         
-        // Test empty number
+        // Note: Empty number is now allowed during creation since numbers are auto-generated
         $invoice->setNumber('');
         $violations = $this->validator->validate($invoice, groups: ['invoice:create']);
-        $this->assertGreaterThan(0, $violations->count());
-        $this->assertStringContainsString('blank', $violations[0]->getMessage());
+        $this->assertCount(0, $violations);
         
-        // Test too long number
+        // Test too long number should still fail
         $invoice->setNumber(str_repeat('A', 51));
         $violations = $this->validator->validate($invoice, groups: ['invoice:create']);
         $this->assertGreaterThan(0, $violations->count());
         $this->assertStringContainsString('50', $violations[0]->getMessage());
         
-        // Test valid number
-        $invoice->setNumber('INV/2024/001');
+        // Test valid number should pass
+        $invoice->setNumber('FV/2024/01/0001');
         $violations = $this->validator->validate($invoice, groups: ['invoice:create']);
         $this->assertCount(0, $violations);
     }
@@ -326,15 +325,16 @@ class InvoiceValidationTest extends KernelTestCase
         $violations = $this->validator->validate($invoice, groups: ['invoice:update']);
         $this->assertCount(0, $violations);
         
-        // Test that some fields are only required in create group
+        // Test that invoice numbers are now auto-generated and empty numbers are allowed
         $invoice->setNumber(''); // Empty number
         
         $createViolations = $this->validator->validate($invoice, groups: ['invoice:create']);
-        $this->assertGreaterThan(0, $createViolations->count());
+        // Numbers are auto-generated, so empty numbers are allowed during creation
+        $this->assertCount(0, $createViolations);
         
         $updateViolations = $this->validator->validate($invoice, groups: ['invoice:update']);
-        // Update might be more lenient for some fields depending on implementation
-        // This depends on specific validation group configuration
+        // Numbers are also allowed to be empty during updates (auto-generated)
+        $this->assertCount(0, $updateViolations);
     }
 
     public function testInvoiceUniqueNumberConstraint(): void

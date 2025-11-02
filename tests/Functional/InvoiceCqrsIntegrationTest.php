@@ -107,7 +107,7 @@ class InvoiceCqrsIntegrationTest extends KernelTestCase
         $this->assertNotNull($invoiceDto);
         $this->assertEquals($invoiceId, $invoiceDto->id);
         $this->assertEquals('PLN', $invoiceDto->currency);
-        $this->assertEquals('draft', $invoiceDto->status);
+        $this->assertEquals(InvoiceStatus::DRAFT, $invoiceDto->status);
         $this->assertFalse($invoiceDto->isPaid);
         $this->assertEquals('Test invoice notes', $invoiceDto->notes);
         $this->assertCount(2, $invoiceDto->items);
