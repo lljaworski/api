@@ -53,7 +53,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(
             uriTemplate: '/invoices',
-            security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_B2B')",
             normalizationContext: ['groups' => ['invoice:read', 'invoice:list']],
             paginationEnabled: true,
             paginationItemsPerPage: 30,
@@ -61,33 +61,33 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new Get(
             uriTemplate: '/invoices/{id}',
-            security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_B2B')",
             normalizationContext: ['groups' => ['invoice:read', 'invoice:details']]
         ),
         new Post(
             uriTemplate: '/invoices',
-            security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_B2B')",
             denormalizationContext: ['groups' => ['invoice:create']],
             normalizationContext: ['groups' => ['invoice:read', 'invoice:details']],
             validationContext: ['groups' => ['invoice:create']]
         ),
         new Put(
             uriTemplate: '/invoices/{id}',
-            security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_B2B')",
             denormalizationContext: ['groups' => ['invoice:update']],
             normalizationContext: ['groups' => ['invoice:read', 'invoice:details']],
             validationContext: ['groups' => ['invoice:update']]
         ),
         new Patch(
             uriTemplate: '/invoices/{id}',
-            security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_B2B')",
             denormalizationContext: ['groups' => ['invoice:update']],
             normalizationContext: ['groups' => ['invoice:read', 'invoice:details']],
             validationContext: ['groups' => ['invoice:update']]
         ),
         new Delete(
             uriTemplate: '/invoices/{id}',
-            security: "is_granted('ROLE_ADMIN')"
+            security: "is_granted('ROLE_B2B')"
         ),
     ],
     provider: InvoiceProvider::class,
