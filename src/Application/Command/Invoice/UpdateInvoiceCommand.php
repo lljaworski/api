@@ -41,6 +41,9 @@ final class UpdateInvoiceCommand extends AbstractCommand
         #[Assert\Length(max: 1000)]
         public readonly ?string $notes = null,
         
+        #[Assert\Type('bool')]
+        public readonly ?bool $isPaid = null,
+        
         #[Assert\Type('array')]
         #[Assert\Valid]
         public readonly ?array $items = null // Array of UpdateInvoiceItemCommand or null to keep existing

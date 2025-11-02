@@ -58,6 +58,9 @@ final class UpdateInvoiceCommandHandler
         if ($command->notes !== null) {
             $invoice->setNotes($command->notes);
         }
+        if ($command->isPaid !== null) {
+            $invoice->setIsPaid($command->isPaid);
+        }
 
         // Update customer if provided
         if ($command->customerId !== null) {
@@ -91,7 +94,12 @@ final class UpdateInvoiceCommandHandler
 
         // Recalculate totals if items were updated
         if ($command->items !== null) {
-            $this->vatCalculationService->calculateInvoiceTotals($invoice);
+            // Recalculate individual item totals
+            foreach ($invoice->getItems() as $item) {
+                $this->vatCalculationService->recalculateInvoiceItem($item);
+            }
+            // Recalculate and update invoice totals
+            $this->vatCalculationService->recalculateInvoiceTotals($invoice);
         }
 
         $this->entityManager->flush();

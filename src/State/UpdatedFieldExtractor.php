@@ -42,9 +42,9 @@ final class UpdatedFieldExtractor
         // Convert camelCase to snake_case for JSON field names
         $jsonFieldName = self::camelCaseToSnakeCase($fieldName);
         
-        // If the field exists in the request data, return the entity's value
+        // If the field exists in the request data, return the requested value
         // If not, return null to indicate it shouldn't be updated
-        return array_key_exists($jsonFieldName, $decodedData) ? $entity->$getterMethod() : null;
+        return array_key_exists($jsonFieldName, $decodedData) ? $decodedData[$jsonFieldName] : null;
     }
     
     /**

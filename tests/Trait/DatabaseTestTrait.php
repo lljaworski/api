@@ -75,6 +75,13 @@ trait DatabaseTestTrait
         $entityManager = $this->entityManager ?? static::getContainer()->get(EntityManagerInterface::class);
         
         try {
+            // Remove all invoices (test data)
+            $invoiceRepository = $entityManager->getRepository(\App\Entity\Invoice::class);
+            $invoices = $invoiceRepository->findAll();
+            foreach ($invoices as $invoice) {
+                $entityManager->remove($invoice);
+            }
+            
             // Remove all companies (test data)
             $companyRepository = $entityManager->getRepository(\App\Entity\Company::class);
             $companies = $companyRepository->findAll();

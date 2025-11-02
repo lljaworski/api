@@ -6,9 +6,11 @@ namespace App\State;
 
 use App\Application\DTO\CompanyDTO;
 use App\Application\DTO\InvoiceDTO;
+use App\Application\DTO\InvoiceItemDTO;
 use App\Application\DTO\UserDTO;
 use App\Entity\Company;
 use App\Entity\Invoice;
+use App\Entity\InvoiceItem;
 use App\Entity\User;
 
 /**
@@ -175,7 +177,39 @@ final class EntityFromDtoFactory
             $invoice->setCustomer($customer);
         }
         
+        // Set invoice items from DTOs
+        foreach ($dto->items as $itemDto) {
+            $item = self::createInvoiceItemFromDTO($itemDto);
+            $invoice->addItem($item);
+        }
+        
         return $invoice;
+    }
+    
+    /**
+     * Creates an InvoiceItem entity from InvoiceItemDTO.
+     */
+    public static function createInvoiceItemFromDTO(InvoiceItemDTO $dto): InvoiceItem
+    {
+        $item = new InvoiceItem();
+        
+        // Use reflection to set private properties
+        $reflection = new \ReflectionClass($item);
+        
+        self::setPrivateProperty($reflection, $item, 'id', $dto->id);
+        
+        // Set all properties using public setters
+        $item->setDescription($dto->description);
+        $item->setQuantity($dto->quantity);
+        $item->setUnit($dto->unit);
+        $item->setUnitPrice($dto->unitPrice);
+        $item->setNetAmount($dto->netAmount);
+        $item->setVatRate($dto->vatRate);
+        $item->setVatAmount($dto->vatAmount);
+        $item->setGrossAmount($dto->grossAmount);
+        $item->setSortOrder($dto->sortOrder);
+        
+        return $item;
     }
     
     /**

@@ -24,6 +24,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
@@ -101,9 +102,8 @@ class Invoice
     private ?int $id = null;
 
     #[ORM\Column(length: 50, unique: true)]
-    #[Assert\NotBlank(groups: ['invoice:create'])]
     #[Assert\Length(max: 50, groups: ['invoice:create', 'invoice:update'])]
-    #[Groups(['invoice:read', 'invoice:list', 'invoice:details', 'invoice:create', 'invoice:update'])]
+    #[Groups(['invoice:read', 'invoice:list', 'invoice:details'])]
     private string $number;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
@@ -143,6 +143,7 @@ class Invoice
     private InvoiceStatus $status = InvoiceStatus::DRAFT;
 
     #[ORM\Column]
+    #[SerializedName('isPaid')]
     #[Groups(['invoice:read', 'invoice:list', 'invoice:details'])]
     private bool $isPaid = false;
 
@@ -313,6 +314,14 @@ class Invoice
     {
         return $this->isPaid;
     }
+    
+    // Alternative getter with 'get' prefix for serialization
+    public function getIsPaid(): bool
+    {
+        return $this->isPaid;
+    }
+    
+
 
     public function setIsPaid(bool $isPaid): static
     {

@@ -50,6 +50,7 @@ final class InvoiceProcessor implements ProcessorInterface
                 currency: UpdatedFieldExtractor::extract($data, $context, 'currency', 'getCurrency'),
                 paymentMethod: UpdatedFieldExtractor::extract($data, $context, 'paymentMethod', 'getPaymentMethod'),
                 notes: UpdatedFieldExtractor::extract($data, $context, 'notes', 'getNotes'),
+                isPaid: UpdatedFieldExtractor::extract($data, $context, 'isPaid', 'isPaid'),
                 customerId: $this->getUpdatedCustomerId($context, $data),
                 items: $this->getUpdatedItems($context, $data)
             );
@@ -92,7 +93,21 @@ final class InvoiceProcessor implements ProcessorInterface
             $decodedData = json_decode($requestData, true, 512, JSON_THROW_ON_ERROR);
             if (isset($decodedData['customer'])) {
                 $customer = $decodedData['customer'];
-                return is_array($customer) ? ($customer['id'] ?? null) : $customer;
+                
+                // Handle IRI format (e.g., "/api/companies/1")
+                if (is_string($customer) && preg_match('/\/api\/companies\/(\d+)$/', $customer, $matches)) {
+                    return (int) $matches[1];
+                }
+                
+                // Handle array format with ID
+                if (is_array($customer) && isset($customer['id'])) {
+                    return (int) $customer['id'];
+                }
+                
+                // Handle direct integer ID
+                if (is_int($customer)) {
+                    return $customer;
+                }
             }
         } catch (\JsonException) {
             // Ignore JSON errors

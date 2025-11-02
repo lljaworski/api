@@ -81,14 +81,13 @@ class InvoiceApiTest extends WebTestCase
         $adminToken = $this->getAuthToken();
         
         $invoiceData = [
-            'number' => 'INV/TEST/001',
             'issueDate' => '2024-01-01',
             'saleDate' => '2024-01-01',
             'dueDate' => '2024-01-31',
             'currency' => 'PLN',
             'paymentMethod' => 1,
             'notes' => 'Test invoice notes',
-            'customer' => $this->testCustomer->getId(),
+            'customer' => $this->getCustomerIri(),
             'items' => [
                 [
                     'description' => 'Test Product 1',
@@ -118,7 +117,7 @@ class InvoiceApiTest extends WebTestCase
         $this->assertJson($this->client->getResponse()->getContent());
         
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertEquals('INV/TEST/001', $responseData['number']);
+        $this->assertMatchesRegularExpression('/^FV\/\d{4}\/\d{2}\/\d{4}$/', $responseData['number']);
         $this->assertEquals('draft', $responseData['status']);
         $this->assertEquals('PLN', $responseData['currency']);
         $this->assertFalse($responseData['isPaid']);
@@ -160,11 +159,10 @@ class InvoiceApiTest extends WebTestCase
         
         // First create an invoice
         $invoiceData = [
-            'number' => 'INV/GET/001',
             'issueDate' => '2024-01-01',
             'saleDate' => '2024-01-01',
             'currency' => 'PLN',
-            'customer' => $this->testCustomer->getId(),
+            'customer' => $this->getCustomerIri(),
             'items' => [
                 [
                     'description' => 'Test Product',
@@ -192,7 +190,7 @@ class InvoiceApiTest extends WebTestCase
         
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertEquals('INV/GET/001', $responseData['number']);
+        $this->assertMatchesRegularExpression('/^FV\/\d{4}\/\d{2}\/\d{4}$/', $responseData['number']);
         $this->assertEquals('draft', $responseData['status']);
         $this->assertCount(1, $responseData['items']);
     }
@@ -214,11 +212,10 @@ class InvoiceApiTest extends WebTestCase
         
         // Create invoice first
         $invoiceData = [
-            'number' => 'INV/UPDATE/001',
             'issueDate' => '2024-01-01',
             'saleDate' => '2024-01-01',
             'currency' => 'PLN',
-            'customer' => $this->testCustomer->getId(),
+            'customer' => $this->getCustomerIri(),
             'items' => [
                 [
                     'description' => 'Original Product',
@@ -236,18 +233,18 @@ class InvoiceApiTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($invoiceData));
         
+        $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         $createResponse = json_decode($this->client->getResponse()->getContent(), true);
         $invoiceId = $createResponse['id'];
         
         // Update the invoice
         $updateData = [
-            'number' => 'INV/UPDATED/001',
             'issueDate' => '2024-02-01',
             'saleDate' => '2024-02-01',
             'dueDate' => '2024-02-28',
             'currency' => 'EUR',
             'notes' => 'Updated notes',
-            'customer' => $this->testCustomer->getId(),
+            'customer' => $this->getCustomerIri(),
             'items' => [
                 [
                     'description' => 'Updated Product',
@@ -268,7 +265,8 @@ class InvoiceApiTest extends WebTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         
-        $this->assertEquals('INV/UPDATED/001', $responseData['number']);
+        // Number should remain unchanged (auto-generated)
+        $this->assertMatchesRegularExpression('/^FV\/\d{4}\/\d{2}\/\d{4}$/', $responseData['number']);
         $this->assertEquals('EUR', $responseData['currency']);
         $this->assertEquals('Updated notes', $responseData['notes']);
         $this->assertCount(1, $responseData['items']);
@@ -286,12 +284,11 @@ class InvoiceApiTest extends WebTestCase
         
         // Create invoice first
         $invoiceData = [
-            'number' => 'INV/PATCH/001',
             'issueDate' => '2024-01-01',
             'saleDate' => '2024-01-01',
             'currency' => 'PLN',
             'notes' => 'Original notes',
-            'customer' => $this->testCustomer->getId(),
+            'customer' => $this->getCustomerIri(),
             'items' => [
                 [
                     'description' => 'Test Product',
@@ -309,6 +306,7 @@ class InvoiceApiTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($invoiceData));
         
+        $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         $createResponse = json_decode($this->client->getResponse()->getContent(), true);
         $invoiceId = $createResponse['id'];
         
@@ -328,10 +326,10 @@ class InvoiceApiTest extends WebTestCase
         
         // Patched fields should be updated
         $this->assertEquals('Partially updated notes', $responseData['notes']);
-        $this->assertEquals('2024-01-31', $responseData['dueDate']);
+        $this->assertEquals('2024-01-31T00:00:00+00:00', $responseData['dueDate']);
         
         // Other fields should remain unchanged
-        $this->assertEquals('INV/PATCH/001', $responseData['number']);
+        $this->assertMatchesRegularExpression('/^FV\/\d{4}\/\d{2}\/\d{4}$/', $responseData['number']);
         $this->assertEquals('PLN', $responseData['currency']);
     }
 
@@ -341,11 +339,10 @@ class InvoiceApiTest extends WebTestCase
         
         // Create invoice first
         $invoiceData = [
-            'number' => 'INV/DELETE/001',
             'issueDate' => '2024-01-01',
             'saleDate' => '2024-01-01',
             'currency' => 'PLN',
-            'customer' => $this->testCustomer->getId(),
+            'customer' => $this->getCustomerIri(),
             'items' => [
                 [
                     'description' => 'Test Product',
@@ -363,6 +360,7 @@ class InvoiceApiTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($invoiceData));
         
+        $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         $createResponse = json_decode($this->client->getResponse()->getContent(), true);
         $invoiceId = $createResponse['id'];
         
@@ -387,11 +385,10 @@ class InvoiceApiTest extends WebTestCase
         
         // Create and issue an invoice
         $invoiceData = [
-            'number' => 'INV/NODELETE/001',
             'issueDate' => '2024-01-01',
             'saleDate' => '2024-01-01',
             'currency' => 'PLN',
-            'customer' => $this->testCustomer->getId(),
+            'customer' => $this->getCustomerIri(),
             'items' => [
                 [
                     'description' => 'Test Product',
@@ -409,6 +406,7 @@ class InvoiceApiTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode($invoiceData));
         
+        $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         $createResponse = json_decode($this->client->getResponse()->getContent(), true);
         $invoiceId = $createResponse['id'];
         
@@ -432,11 +430,10 @@ class InvoiceApiTest extends WebTestCase
         
         foreach ($currencies as $currency) {
             $invoiceData = [
-                'number' => "INV/{$currency}/001",
                 'issueDate' => '2024-01-01',
                 'saleDate' => '2024-01-01',
                 'currency' => $currency,
-                'customer' => $this->testCustomer->getId(),
+                'customer' => $this->getCustomerIri(),
                 'items' => [
                     [
                         'description' => 'Test Product',
@@ -464,20 +461,16 @@ class InvoiceApiTest extends WebTestCase
     {
         $adminToken = $this->getAuthToken();
         
-        // Create invoices with different data for filtering
-        $invoices = [
-            ['number' => 'INV/FILTER/001', 'currency' => 'PLN'],
-            ['number' => 'INV/FILTER/002', 'currency' => 'EUR'],
-            ['number' => 'TEST/FILTER/003', 'currency' => 'PLN'],
-        ];
+        // Create invoices with different currencies for filtering
+        $createdInvoices = [];
+        $currencies = ['PLN', 'EUR', 'PLN']; // 2 PLN, 1 EUR
         
-        foreach ($invoices as $invoice) {
+        foreach ($currencies as $currency) {
             $invoiceData = [
-                'number' => $invoice['number'],
                 'issueDate' => '2024-01-01',
                 'saleDate' => '2024-01-01',
-                'currency' => $invoice['currency'],
-                'customer' => $this->testCustomer->getId(),
+                'currency' => $currency,
+                'customer' => $this->getCustomerIri(),
                 'items' => [
                     [
                         'description' => 'Test Product',
@@ -496,10 +489,12 @@ class InvoiceApiTest extends WebTestCase
             ], json_encode($invoiceData));
             
             $this->assertEquals(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
+            $responseData = json_decode($this->client->getResponse()->getContent(), true);
+            $createdInvoices[] = $responseData;
         }
         
-        // Test filtering by number (partial match)
-        $this->client->request(Request::METHOD_GET, '/api/invoices?number=INV/FILTER', [], [], [
+        // Test filtering by number pattern (all should start with FV/2024)
+        $this->client->request(Request::METHOD_GET, '/api/invoices?number=FV/2024', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer ' . $adminToken,
             'HTTP_ACCEPT' => 'application/json'
         ]);
@@ -507,8 +502,8 @@ class InvoiceApiTest extends WebTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         
-        // Should find 2 invoices with INV/FILTER in number
-        $this->assertGreaterThanOrEqual(2, count($responseData['data']));
+        // Should find at least the 3 invoices we just created
+        $this->assertGreaterThanOrEqual(3, $responseData['pagination']['total']);
         
         // Test filtering by currency
         $this->client->request(Request::METHOD_GET, '/api/invoices?currency=EUR', [], [], [
@@ -555,6 +550,11 @@ class InvoiceApiTest extends WebTestCase
         $this->entityManager->flush();
         
         $this->trackEntityForCleanup($this->testCustomer);
+    }
+
+    private function getCustomerIri(): string
+    {
+        return '/api/companies/' . $this->testCustomer->getId();
     }
 
     private function getAuthToken(string $username = 'admin', string $password = 'admin123!'): string

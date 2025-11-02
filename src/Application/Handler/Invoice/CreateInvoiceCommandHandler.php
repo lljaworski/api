@@ -68,11 +68,13 @@ final class CreateInvoiceCommandHandler
             $item->setVatRate($itemData['vatRate']);
             $item->setSortOrder($itemData['sortOrder']);
             
+            // Calculate item totals
+            $this->vatCalculationService->recalculateInvoiceItem($item);
             $invoice->addItem($item);
         }
 
-        // Calculate totals
-        $this->vatCalculationService->calculateInvoiceTotals($invoice);
+        // Calculate and update invoice totals
+        $this->vatCalculationService->recalculateInvoiceTotals($invoice);
 
         $this->entityManager->persist($invoice);
         $this->entityManager->flush();
