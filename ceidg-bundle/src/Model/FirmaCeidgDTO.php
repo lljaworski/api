@@ -53,4 +53,18 @@ final readonly class FirmaCeidgDTO
                 : null,
         );
     }
+
+    public function toArray(): array
+    {
+        return [
+            'nip' => $this->nip,
+            'nazwa' => $this->nazwa,
+            'dataRozpoczeciaDzialalnosci' => $this->dataRozpoczeciaDzialalnosci->format('Y-m-d'),
+            'dataPowstania' => $this->dataPowstania->format('Y-m-d'),
+            'status' => $this->status,
+            'dataZawieszeniaDzialalnosci' => $this->dataZawieszeniaDzialalnosci?->format('Y-m-d'),
+            'dataWznowieniaDzialalnosci' => $this->dataWznowieniaDzialalnosci?->format('Y-m-d'),
+            'dataZakonczeniaDzialalnosci' => $this->dataZakonczeniaDzialalnosci?->format('Y-m-d'),
+        ];
+    }
 }
