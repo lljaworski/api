@@ -14,6 +14,10 @@ services:
             $httpClient: '@http_client'
             $apiUrl: '%env(CEIDG_API_URL)%'
             $apiKey: '%env(CEIDG_API_KEY)%'
+            $cache: '@cache.app'
+            $logger: '@logger'
+        tags:
+            - { name: 'monolog.logger', channel: 'ceidg' }
 
     LukaszJaworski\CeidgBundle\Command\:
         resource: '../src/Command/*'
@@ -21,6 +25,8 @@ services:
 
     LukaszJaworski\CeidgBundle\State\:
         resource: '../src/State/*'
+        tags:
+            - { name: 'monolog.logger', channel: 'ceidg' }
 
     LukaszJaworski\CeidgBundle\Repository\:
         resource: '../src/Repository/*'

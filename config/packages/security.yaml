@@ -38,6 +38,7 @@ security:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/(health|ping), roles: PUBLIC_ACCESS }
         - { path: ^/api/protected, roles: ROLE_USER }
+        - { path: ^/api/ceidg, roles: ROLE_USER }
         - { path: ^/api, roles: PUBLIC_ACCESS }
 
 when@test:
