@@ -8,6 +8,13 @@ services:
     LukaszJaworski\CeidgBundle\Service\:
         resource: '../src/Service/*'
 
+    # Configure CEIDG API Service with environment variables
+    LukaszJaworski\CeidgBundle\Service\CeidgApiService:
+        arguments:
+            $httpClient: '@http_client'
+            $apiUrl: '%env(CEIDG_API_URL)%'
+            $apiKey: '%env(CEIDG_API_KEY)%'
+
     LukaszJaworski\CeidgBundle\Command\:
         resource: '../src/Command/*'
         tags: ['console.command']
