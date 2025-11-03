@@ -55,6 +55,12 @@ final readonly class CeidgCompanyProvider implements ProviderInterface
                 throw new NotFoundHttpException(sprintf('Company with NIP %s not found in CEIDG registry', $nip));
             }
 
+            // Map additional addresses to array format
+            $adresyDodatkowe = array_map(
+                fn($adres) => $adres->toArray(),
+                $companyDto->adresyDzialalnosciDodatkowe
+            );
+
             return new CeidgCompany(
                 nip: $companyDto->nip,
                 nazwa: $companyDto->nazwa,
@@ -64,6 +70,9 @@ final readonly class CeidgCompanyProvider implements ProviderInterface
                 dataZawieszeniaDzialalnosci: $companyDto->dataZawieszeniaDzialalnosci?->format('Y-m-d'),
                 dataWznowieniaDzialalnosci: $companyDto->dataWznowieniaDzialalnosci?->format('Y-m-d'),
                 dataZakonczeniaDzialalnosci: $companyDto->dataZakonczeniaDzialalnosci?->format('Y-m-d'),
+                adresDzialalnosci: $companyDto->adresDzialalnosci?->toArray(),
+                adresKorespondencyjny: $companyDto->adresKorespondencyjny?->toArray(),
+                adresyDzialalnosciDodatkowe: $adresyDodatkowe,
             );
             
         } catch (CeidgApiException $e) {

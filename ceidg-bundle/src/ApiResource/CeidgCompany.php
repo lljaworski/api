@@ -58,6 +58,29 @@ class CeidgCompany
     #[Groups(['ceidg:read'])]
     public ?string $dataZakonczeniaDzialalnosci = null;
 
+    /**
+     * @var array<string, mixed>|null Primary business activity address
+     */
+    #[Groups(['ceidg:read'])]
+    public ?array $adresDzialalnosci = null;
+
+    /**
+     * @var array<string, mixed>|null Correspondence/mailing address
+     */
+    #[Groups(['ceidg:read'])]
+    public ?array $adresKorespondencyjny = null;
+
+    /**
+     * @var array<int, array<string, mixed>> Additional business activity addresses
+     */
+    #[Groups(['ceidg:read'])]
+    public array $adresyDzialalnosciDodatkowe = [];
+
+    /**
+     * @param array<string, mixed>|null $adresDzialalnosci
+     * @param array<string, mixed>|null $adresKorespondencyjny
+     * @param array<int, array<string, mixed>> $adresyDzialalnosciDodatkowe
+     */
     public function __construct(
         string $nip,
         string $nazwa,
@@ -67,6 +90,9 @@ class CeidgCompany
         ?string $dataZawieszeniaDzialalnosci = null,
         ?string $dataWznowieniaDzialalnosci = null,
         ?string $dataZakonczeniaDzialalnosci = null,
+        ?array $adresDzialalnosci = null,
+        ?array $adresKorespondencyjny = null,
+        array $adresyDzialalnosciDodatkowe = [],
     ) {
         $this->nip = $nip;
         $this->nazwa = $nazwa;
@@ -76,5 +102,8 @@ class CeidgCompany
         $this->dataZawieszeniaDzialalnosci = $dataZawieszeniaDzialalnosci;
         $this->dataWznowieniaDzialalnosci = $dataWznowieniaDzialalnosci;
         $this->dataZakonczeniaDzialalnosci = $dataZakonczeniaDzialalnosci;
+        $this->adresDzialalnosci = $adresDzialalnosci;
+        $this->adresKorespondencyjny = $adresKorespondencyjny;
+        $this->adresyDzialalnosciDodatkowe = $adresyDzialalnosciDodatkowe;
     }
 }

@@ -6,10 +6,13 @@ namespace LukaszJaworski\CeidgBundle\Model;
 
 /**
  * Data Transfer Object for CEIDG company (Firma) data.
- * Contains essential fields from Polish business registry.
+ * Contains essential fields from Polish business registry including addresses.
  */
 final readonly class FirmaCeidgDTO
 {
+    /**
+     * @param array<int, AdresDTO> $adresyDzialalnosciDodatkowe Additional business activity addresses
+     */
     public function __construct(
         public string $nip,
         public string $nazwa,
@@ -19,6 +22,9 @@ final readonly class FirmaCeidgDTO
         public ?\DateTimeInterface $dataZawieszeniaDzialalnosci = null,
         public ?\DateTimeInterface $dataWznowieniaDzialalnosci = null,
         public ?\DateTimeInterface $dataZakonczeniaDzialalnosci = null,
+        public ?AdresDTO $adresDzialalnosci = null,
+        public ?AdresDTO $adresKorespondencyjny = null,
+        public array $adresyDzialalnosciDodatkowe = [],
     ) {}
 
     /**
@@ -31,6 +37,17 @@ final readonly class FirmaCeidgDTO
     {
         // NIP is nested in wlasciciel (owner) object
         $nip = $data['wlasciciel']['nip'] ?? '';
+        
+        // Parse additional business addresses
+        $adresyDodatkowe = [];
+        if (isset($data['adresyDzialalnosciDodatkowe']) && is_array($data['adresyDzialalnosciDodatkowe'])) {
+            foreach ($data['adresyDzialalnosciDodatkowe'] as $adresData) {
+                $adres = AdresDTO::fromApiResponse($adresData);
+                if ($adres !== null) {
+                    $adresyDodatkowe[] = $adres;
+                }
+            }
+        }
         
         return new self(
             nip: $nip,
@@ -51,6 +68,9 @@ final readonly class FirmaCeidgDTO
             dataZakonczeniaDzialalnosci: isset($data['dataZakonczenia']) 
                 ? new \DateTimeImmutable($data['dataZakonczenia']) 
                 : null,
+            adresDzialalnosci: AdresDTO::fromApiResponse($data['adresDzialalnosci'] ?? null),
+            adresKorespondencyjny: AdresDTO::fromApiResponse($data['adresKorespondencyjny'] ?? null),
+            adresyDzialalnosciDodatkowe: $adresyDodatkowe,
         );
     }
 
@@ -65,6 +85,12 @@ final readonly class FirmaCeidgDTO
             'dataZawieszeniaDzialalnosci' => $this->dataZawieszeniaDzialalnosci?->format('Y-m-d'),
             'dataWznowieniaDzialalnosci' => $this->dataWznowieniaDzialalnosci?->format('Y-m-d'),
             'dataZakonczeniaDzialalnosci' => $this->dataZakonczeniaDzialalnosci?->format('Y-m-d'),
+            'adresDzialalnosci' => $this->adresDzialalnosci?->toArray(),
+            'adresKorespondencyjny' => $this->adresKorespondencyjny?->toArray(),
+            'adresyDzialalnosciDodatkowe' => array_map(
+                fn(AdresDTO $adres) => $adres->toArray(),
+                $this->adresyDzialalnosciDodatkowe
+            ),
         ];
     }
 }
