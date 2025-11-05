@@ -8,8 +8,11 @@ use LukaszJaworski\CeidgBundle\Exception\CeidgApiException;
 use LukaszJaworski\CeidgBundle\Model\FirmaCeidgDTO;
 use LukaszJaworski\CeidgBundle\Service\CeidgApiService;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class CeidgApiServiceTest extends TestCase
 {
@@ -24,7 +27,11 @@ class CeidgApiServiceTest extends TestCase
         $apiUrl = $_ENV['CEIDG_API_URL'] ?? 'https://dane.biznes.gov.pl/api/ceidg/v3/firmy';
         $apiKey = $_ENV['CEIDG_API_KEY'] ?? '';
         
-        $this->ceidgApiService = new CeidgApiService($httpClient, $apiUrl, $apiKey);
+        // Create mock cache and logger for testing
+        $cache = new ArrayAdapter();
+        $logger = $this->createMock(LoggerInterface::class);
+        
+        $this->ceidgApiService = new CeidgApiService($httpClient, $apiUrl, $apiKey, $cache, $logger);
     }
 
     public function testFindByNipReturnsCompanyDataForValidNip(): void
@@ -59,10 +66,14 @@ class CeidgApiServiceTest extends TestCase
         
         // Use invalid API key to trigger 401 error
         $httpClient = HttpClient::create();
+        $cache = new ArrayAdapter();
+        $logger = $this->createMock(LoggerInterface::class);
         $invalidService = new CeidgApiService(
             $httpClient,
             'https://dane.biznes.gov.pl/api/ceidg/v3/firmy',
-            'invalid_api_key'
+            'invalid_api_key',
+            $cache,
+            $logger
         );
         
         $invalidService->findByNip('6292346813');

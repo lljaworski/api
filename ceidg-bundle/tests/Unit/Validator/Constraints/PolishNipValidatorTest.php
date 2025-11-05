@@ -6,6 +6,7 @@ namespace LukaszJaworski\CeidgBundle\Tests\Unit\Validator\Constraints;
 
 use LukaszJaworski\CeidgBundle\Validator\Constraints\PolishNip;
 use LukaszJaworski\CeidgBundle\Validator\Constraints\PolishNipValidator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
@@ -143,9 +144,7 @@ class PolishNipValidatorTest extends TestCase
         $this->validator->validate('123@456#89', $this->constraint);
     }
 
-    /**
-     * @dataProvider validNipProvider
-     */
+    #[DataProvider('validNipProvider')]
     public function testValidNipFormats(string $nip): void
     {
         $this->context->expects($this->never())
@@ -166,9 +165,7 @@ class PolishNipValidatorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidNipProvider
-     */
+    #[DataProvider('invalidNipProvider')]
     public function testInvalidNipFormats(string $nip): void
     {
         $this->violationBuilder->expects($this->once())
