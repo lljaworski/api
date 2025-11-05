@@ -3,9 +3,11 @@
 namespace App\Tests\Trait;
 
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Response;
 
 Trait RequestTrait
 {
+    private ?string $adminToken = null;
     public function requestAsAdmin(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], ?string $content = null, bool $changeHistory = true): Crawler
     {
         $token = $this->getAuthToken();
@@ -25,7 +27,7 @@ Trait RequestTrait
                 'password' => 'admin123!'
             ]));
             
-            $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+            $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
             $responseData = json_decode($this->client->getResponse()->getContent(), true);
             $this->adminToken = $responseData['token'];
         }
