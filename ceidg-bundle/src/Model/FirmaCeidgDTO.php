@@ -25,6 +25,11 @@ final readonly class FirmaCeidgDTO
         public ?AdresDTO $adresDzialalnosci = null,
         public ?AdresDTO $adresKorespondencyjny = null,
         public array $adresyDzialalnosciDodatkowe = [],
+        public ?string $telefon = null,
+        public ?string $email = null,
+        public ?string $www = null,
+        public ?string $adresDoreczenElektronicznych = null,
+        public ?string $innaFormaKonaktu = null,
     ) {}
 
     /**
@@ -71,6 +76,11 @@ final readonly class FirmaCeidgDTO
             adresDzialalnosci: AdresDTO::fromApiResponse($data['adresDzialalnosci'] ?? null),
             adresKorespondencyjny: AdresDTO::fromApiResponse($data['adresKorespondencyjny'] ?? null),
             adresyDzialalnosciDodatkowe: $adresyDodatkowe,
+            telefon: $data['telefon'] ?? null,
+            email: $data['email'] ?? null,
+            www: $data['www'] ?? null,
+            adresDoreczenElektronicznych: $data['adresDoreczenElektronicznych'] ?? null,
+            innaFormaKonaktu: $data['innaFormaKonaktu'] ?? null,
         );
     }
 
@@ -91,6 +101,11 @@ final readonly class FirmaCeidgDTO
                 fn(AdresDTO $adres) => $adres->toArray(),
                 $this->adresyDzialalnosciDodatkowe
             ),
+            'telefon' => $this->telefon,
+            'email' => $this->email,
+            'www' => $this->www,
+            'adresDoreczenElektronicznych' => $this->adresDoreczenElektronicznych,
+            'innaFormaKonaktu' => $this->innaFormaKonaktu,
         ];
     }
 }

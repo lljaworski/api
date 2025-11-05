@@ -73,6 +73,11 @@ final readonly class CeidgCompanyProvider implements ProviderInterface
                 adresDzialalnosci: $companyDto->adresDzialalnosci?->toArray(),
                 adresKorespondencyjny: $companyDto->adresKorespondencyjny?->toArray(),
                 adresyDzialalnosciDodatkowe: $adresyDodatkowe,
+                telefon: $companyDto->telefon,
+                email: $companyDto->email,
+                www: $companyDto->www,
+                adresDoreczenElektronicznych: $companyDto->adresDoreczenElektronicznych,
+                innaFormaKonaktu: $companyDto->innaFormaKonaktu,
             );
             
         } catch (CeidgApiException $e) {

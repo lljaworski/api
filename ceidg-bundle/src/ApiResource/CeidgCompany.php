@@ -76,6 +76,21 @@ class CeidgCompany
     #[Groups(['ceidg:read'])]
     public array $adresyDzialalnosciDodatkowe = [];
 
+    #[Groups(['ceidg:read'])]
+    public ?string $telefon = null;
+
+    #[Groups(['ceidg:read'])]
+    public ?string $email = null;
+
+    #[Groups(['ceidg:read'])]
+    public ?string $www = null;
+
+    #[Groups(['ceidg:read'])]
+    public ?string $adresDoreczenElektronicznych = null;
+
+    #[Groups(['ceidg:read'])]
+    public ?string $innaFormaKonaktu = null;
+
     /**
      * @param array<string, mixed>|null $adresDzialalnosci
      * @param array<string, mixed>|null $adresKorespondencyjny
@@ -93,6 +108,11 @@ class CeidgCompany
         ?array $adresDzialalnosci = null,
         ?array $adresKorespondencyjny = null,
         array $adresyDzialalnosciDodatkowe = [],
+        ?string $telefon = null,
+        ?string $email = null,
+        ?string $www = null,
+        ?string $adresDoreczenElektronicznych = null,
+        ?string $innaFormaKonaktu = null,
     ) {
         $this->nip = $nip;
         $this->nazwa = $nazwa;
@@ -105,5 +125,10 @@ class CeidgCompany
         $this->adresDzialalnosci = $adresDzialalnosci;
         $this->adresKorespondencyjny = $adresKorespondencyjny;
         $this->adresyDzialalnosciDodatkowe = $adresyDzialalnosciDodatkowe;
+        $this->telefon = $telefon;
+        $this->email = $email;
+        $this->www = $www;
+        $this->adresDoreczenElektronicznych = $adresDoreczenElektronicznych;
+        $this->innaFormaKonaktu = $innaFormaKonaktu;
     }
 }

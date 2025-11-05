@@ -149,6 +149,54 @@ class CeidgCompanyEndpointTest extends WebTestCase
         }
     }
 
+    public function testResponseStructureContainsContactFields(): void
+    {
+        ['client' => $client, 'token' => $token] = $this->getAuthenticatedClient();
+        
+        $client->request(Request::METHOD_GET, '/api/ceidg/companies/1234567890', [], [], [
+            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+            'HTTP_ACCEPT' => 'application/json',
+        ]);
+        
+        $statusCode = $client->getResponse()->getStatusCode();
+        
+        // Only check structure if company was found (200)
+        if ($statusCode === Response::HTTP_OK) {
+            $responseData = json_decode($client->getResponse()->getContent(), true);
+            
+            // Verify contact fields are present in response structure
+            $this->assertArrayHasKey('telefon', $responseData);
+            $this->assertArrayHasKey('email', $responseData);
+            $this->assertArrayHasKey('www', $responseData);
+            $this->assertArrayHasKey('adresDoreczenElektronicznych', $responseData);
+            $this->assertArrayHasKey('innaFormaKonaktu', $responseData);
+            
+            // Contact fields can be null or strings
+            if ($responseData['telefon'] !== null) {
+                $this->assertIsString($responseData['telefon']);
+            }
+            
+            if ($responseData['email'] !== null) {
+                $this->assertIsString($responseData['email']);
+            }
+            
+            if ($responseData['www'] !== null) {
+                $this->assertIsString($responseData['www']);
+            }
+            
+            if ($responseData['adresDoreczenElektronicznych'] !== null) {
+                $this->assertIsString($responseData['adresDoreczenElektronicznych']);
+            }
+            
+            if ($responseData['innaFormaKonaktu'] !== null) {
+                $this->assertIsString($responseData['innaFormaKonaktu']);
+            }
+        } else {
+            // For 404 or 503, just verify the status
+            $this->assertContains($statusCode, [Response::HTTP_NOT_FOUND, Response::HTTP_SERVICE_UNAVAILABLE]);
+        }
+    }
+
     public function testRoleUserCanAccessEndpoint(): void
     {
         ['client' => $client, 'token' => $token] = $this->getAuthenticatedClient();
