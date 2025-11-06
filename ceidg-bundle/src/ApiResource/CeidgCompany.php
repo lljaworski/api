@@ -23,7 +23,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
             requirements: ['nip' => '\d{10}'],
             security: "is_granted('ROLE_USER')",
             provider: CeidgCompanyProvider::class,
-            normalizationContext: ['groups' => ['ceidg:read']],
+            normalizationContext: [
+                'groups' => ['ceidg:read'],
+                'skip_null_values' => false
+            ],
             name: 'get_ceidg_company',
             description: 'Get company data from CEIDG by NIP (10-digit Polish Tax ID)'
         )
