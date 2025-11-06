@@ -174,6 +174,94 @@ final readonly class CeidgApiService
         // Get first company from array
         $companyData = $data['firmy'][0];
 
+        // Debug: Check if we have a link for detailed information
+        if (isset($companyData['link'])) {
+            $this->logger->info('Company has detail link available', [
+                'nip' => $companyData['wlasciciel']['nip'] ?? 'unknown',
+                'link' => $companyData['link'],
+            ]);
+            
+            // Try to fetch detailed information from the link
+            $detailedData = $this->fetchFromDetailLink($companyData['link']);
+            if ($detailedData !== null && isset($detailedData['firma']) && !empty($detailedData['firma'])) {
+                // Extract the detailed company data from the 'firma' array
+                $detailedCompanyData = $detailedData['firma'][0];
+                
+                // Merge specific contact fields from detailed data into basic data
+                $mergedData = array_merge($companyData, [
+                    'telefon' => $detailedCompanyData['telefon'] ?? null,
+                    'email' => $detailedCompanyData['email'] ?? null,
+                    'www' => $detailedCompanyData['www'] ?? null,
+                    'adresDoreczenElektronicznych' => $detailedCompanyData['adresDoreczenElektronicznych'] ?? null,
+                    'innaFormaKonaktu' => $detailedCompanyData['innaFormaKonaktu'] ?? null,
+                    // Also merge more complete address data if available
+                    'adresKorespondencyjny' => $detailedCompanyData['adresKorespondencyjny'] ?? $companyData['adresKorespondencyjny'] ?? null,
+                ]);
+                
+                $this->logger->info('Successfully merged detailed contact information', [
+                    'nip' => $companyData['wlasciciel']['nip'] ?? 'unknown',
+                    'telefon' => $mergedData['telefon'] ?? 'not available',
+                    'email' => $mergedData['email'] ?? 'not available',
+                ]);
+                
+                return FirmaCeidgDTO::fromApiResponse($mergedData);
+            }
+        }
+
         return FirmaCeidgDTO::fromApiResponse($companyData);
+    }
+
+    /**
+     * Fetch detailed company information from a specific detail link.
+     * 
+     * @param string $detailLink The detail link URL from the basic API response
+     * @return array|null Array of detailed company data or null if fetch fails
+     */
+    private function fetchFromDetailLink(string $detailLink): ?array
+    {
+        try {
+            $this->logger->info('Fetching detailed company data from link', [
+                'link' => $detailLink,
+            ]);
+            
+            $response = $this->httpClient->request('GET', $detailLink, [
+                'headers' => [
+                    'Accept' => self::ACCEPT_HEADER,
+                    'Authorization' => sprintf('Bearer %s', $this->apiKey),
+                ],
+                'timeout' => self::REQUEST_TIMEOUT,
+            ]);
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode === Response::HTTP_OK) {
+                $responseData = $response->toArray();
+                
+                $this->logger->info('Detailed company data fetched successfully', [
+                    'link' => $detailLink,
+                    'hasData' => !empty($responseData),
+                ]);
+                
+                // Log the detailed response to see what additional fields we get
+                $this->logger->info('Raw detailed CEIDG company data', [
+                    'detailedData' => $responseData,
+                ]);
+                
+                return $responseData;
+            } else {
+                $this->logger->warning('Failed to fetch detailed company data', [
+                    'link' => $detailLink,
+                    'status_code' => $statusCode,
+                ]);
+                return null;
+            }
+            
+        } catch (\Throwable $e) {
+            $this->logger->error('Error fetching detailed company data', [
+                'link' => $detailLink,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
     }
 }
