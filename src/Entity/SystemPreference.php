@@ -81,7 +81,7 @@ class SystemPreference
     #[Groups(['preference:read', 'preference:list', 'preference:details'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100, unique: true, enumType: PreferenceKey::class)]
+    #[ORM\Column(type: 'string', length: 100, unique: true, enumType: PreferenceKey::class)]
     #[Assert\NotBlank(groups: ['preference:create'])]
     #[Groups(['preference:read', 'preference:list', 'preference:details', 'preference:create', 'preference:update'])]
     private PreferenceKey $preferenceKey;
