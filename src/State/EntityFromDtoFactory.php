@@ -7,10 +7,12 @@ namespace App\State;
 use App\Application\DTO\CompanyDTO;
 use App\Application\DTO\InvoiceDTO;
 use App\Application\DTO\InvoiceItemDTO;
+use App\Application\DTO\SystemPreferenceDTO;
 use App\Application\DTO\UserDTO;
 use App\Entity\Company;
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
+use App\Entity\SystemPreference;
 use App\Entity\User;
 
 /**
@@ -210,6 +212,33 @@ final class EntityFromDtoFactory
         $item->setSortOrder($dto->sortOrder);
         
         return $item;
+    }
+    
+    /**
+     * Creates a SystemPreference entity from SystemPreferenceDTO with all properties set via reflection.
+     */
+    public static function createSystemPreferenceFromDTO(SystemPreferenceDTO $dto): SystemPreference
+    {
+        $preference = new SystemPreference($dto->preferenceKey, $dto->value);
+        
+        // Use reflection to set private properties since this is for read-only display
+        $reflection = new \ReflectionClass($preference);
+        
+        self::setPrivateProperty($reflection, $preference, 'id', $dto->id);
+        self::setPrivateProperty(
+            $reflection, 
+            $preference, 
+            'createdAt', 
+            \DateTime::createFromImmutable($dto->createdAt)
+        );
+        self::setPrivateProperty(
+            $reflection, 
+            $preference, 
+            'updatedAt', 
+            \DateTime::createFromImmutable($dto->updatedAt)
+        );
+        
+        return $preference;
     }
     
     /**
