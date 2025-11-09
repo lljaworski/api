@@ -5,33 +5,49 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Repository\InvoiceRepository;
+use App\Repository\InvoiceSettingsRepository;
 
 class InvoiceNumberGenerator
 {
-    private const PREFIX = 'FV';
-    private const FORMAT = '%s/%s/%s/%04d';
-
     public function __construct(
-        private readonly InvoiceRepository $invoiceRepository
+        private readonly InvoiceRepository $invoiceRepository,
+        private readonly InvoiceSettingsRepository $settingsRepository
     ) {}
 
     /**
-     * Generate a unique invoice number based on issue date
-     * Format: FV/YYYY/MM/NNNN (e.g., FV/2025/10/0001)
+     * Generate a unique invoice number based on issue date and configured format
      */
     public function generate(\DateTimeInterface $issueDate): string
+    {
+        $settings = $this->settingsRepository->getOrCreateSettings();
+        $format = $settings->getNumberFormat();
+        
+        return $this->generateFromFormat($format, $issueDate);
+    }
+
+    /**
+     * Generate invoice number from a specific format template
+     */
+    public function generateFromFormat(string $format, \DateTimeInterface $issueDate): string
     {
         $year = $issueDate->format('Y');
         $month = $issueDate->format('m');
         $sequenceNumber = $this->invoiceRepository->getNextSequenceNumber($issueDate);
 
-        return sprintf(
-            self::FORMAT,
-            self::PREFIX,
-            $year,
-            $month,
-            $sequenceNumber
-        );
+        // Replace placeholders
+        $number = str_replace('{year}', $year, $format);
+        $number = str_replace('{month}', $month, $number);
+        
+        // Handle {number} or {number:N} placeholder
+        if (preg_match('/\{number:(\d+)\}/', $number, $matches)) {
+            $padding = (int) $matches[1];
+            $formattedSequence = str_pad((string) $sequenceNumber, $padding, '0', STR_PAD_LEFT);
+            $number = preg_replace('/\{number:\d+\}/', $formattedSequence, $number);
+        } else {
+            $number = str_replace('{number}', (string) $sequenceNumber, $number);
+        }
+
+        return $number;
     }
 
     /**
@@ -43,12 +59,20 @@ class InvoiceNumberGenerator
     }
 
     /**
-     * Validate if an invoice number follows the expected format
+     * Validate if an invoice number follows the expected format from settings
      */
     public function isValidFormat(string $number): bool
     {
-        $pattern = '/^FV\/\d{4}\/\d{2}\/\d{4}$/';
-        return preg_match($pattern, $number) === 1;
+        $settings = $this->settingsRepository->getOrCreateSettings();
+        $format = $settings->getNumberFormat();
+        
+        // Create a regex pattern from the format template
+        $pattern = preg_quote($format, '/');
+        $pattern = str_replace('\{year\}', '\d{4}', $pattern);
+        $pattern = str_replace('\{month\}', '\d{2}', $pattern);
+        $pattern = preg_replace('/\\\{number(?::\d+)?\\\}/', '\d+', $pattern);
+        
+        return preg_match('/^' . $pattern . '$/', $number) === 1;
     }
 
     /**
@@ -119,7 +143,8 @@ class InvoiceNumberGenerator
      */
     public function getFormatTemplate(): string
     {
-        return 'FV/YYYY/MM/NNNN';
+        $settings = $this->settingsRepository->getOrCreateSettings();
+        return $settings->getNumberFormat();
     }
 
     /**
