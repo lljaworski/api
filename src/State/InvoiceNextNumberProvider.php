@@ -39,14 +39,9 @@ class InvoiceNextNumberProvider implements ProviderInterface
         if ($dateString === null || $dateString === '') {
             $issueDate = new \DateTime();
         } else {
-            try {
-                $issueDate = \DateTime::createFromFormat('Y-m-d', $dateString);
-                if ($issueDate === false) {
-                    throw new BadRequestHttpException(
-                        sprintf('Invalid date format: %s. Expected format: YYYY-MM-DD', $dateString)
-                    );
-                }
-            } catch (\Exception $e) {
+            // Use strict date validation
+            $issueDate = \DateTime::createFromFormat('Y-m-d', $dateString);
+            if ($issueDate === false || $issueDate->format('Y-m-d') !== $dateString) {
                 throw new BadRequestHttpException(
                     sprintf('Invalid date format: %s. Expected format: YYYY-MM-DD', $dateString)
                 );

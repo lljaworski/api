@@ -66,11 +66,18 @@ class InvoiceNumberGenerator
         $settings = $this->settingsRepository->getOrCreateSettings();
         $format = $settings->getNumberFormat();
         
-        // Create a regex pattern from the format template
-        $pattern = preg_quote($format, '/');
-        $pattern = str_replace('\{year\}', '\d{4}', $pattern);
-        $pattern = str_replace('\{month\}', '\d{2}', $pattern);
-        $pattern = preg_replace('/\\\{number(?::\d+)?\\\}/', '\d+', $pattern);
+        // Replace placeholders with temporary markers before quoting
+        $pattern = str_replace('{year}', '§YEAR§', $format);
+        $pattern = str_replace('{month}', '§MONTH§', $pattern);
+        $pattern = preg_replace('/\{number(?::\d+)?\}/', '§NUMBER§', $pattern);
+        
+        // Quote the pattern to escape special regex characters
+        $pattern = preg_quote($pattern, '/');
+        
+        // Replace markers with regex patterns
+        $pattern = str_replace('§YEAR§', '\d{4}', $pattern);
+        $pattern = str_replace('§MONTH§', '\d{2}', $pattern);
+        $pattern = str_replace('§NUMBER§', '\d+', $pattern);
         
         return preg_match('/^' . $pattern . '$/', $number) === 1;
     }
