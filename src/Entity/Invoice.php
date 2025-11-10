@@ -19,6 +19,7 @@ use App\Enum\PaymentMethodEnum;
 use App\Repository\InvoiceRepository;
 use App\State\InvoiceProcessor;
 use App\State\InvoiceProvider;
+use App\State\PayInvoiceProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -89,6 +90,13 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Delete(
             uriTemplate: '/invoices/{id}',
             security: "is_granted('ROLE_B2B')"
+        ),
+        new Post(
+            uriTemplate: '/invoices/{id}/pay',
+            security: "is_granted('ROLE_B2B')",
+            processor: PayInvoiceProcessor::class,
+            normalizationContext: ['groups' => ['invoice:read', 'invoice:details']],
+            description: 'Mark an invoice as paid'
         ),
     ],
     provider: InvoiceProvider::class,
