@@ -140,7 +140,7 @@ class Invoice
 
     #[ORM\Column(type: 'string', enumType: InvoiceStatus::class)]
     #[Groups(['invoice:read', 'invoice:list', 'invoice:details'])]
-    private InvoiceStatus $status = InvoiceStatus::DRAFT;
+    private InvoiceStatus $status = InvoiceStatus::ISSUED;
 
     #[ORM\Column]
     #[SerializedName('isPaid')]

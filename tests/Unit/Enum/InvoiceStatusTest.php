@@ -70,7 +70,7 @@ class InvoiceStatusTest extends TestCase
     public function testEditableStates(): void
     {
         $this->assertTrue(InvoiceStatus::DRAFT->isEditable());
-        $this->assertFalse(InvoiceStatus::ISSUED->isEditable());
+        $this->assertTrue(InvoiceStatus::ISSUED->isEditable()); // Changed: ISSUED invoices are now editable
         $this->assertFalse(InvoiceStatus::PAID->isEditable());
         $this->assertFalse(InvoiceStatus::CANCELLED->isEditable());
     }
@@ -157,8 +157,8 @@ class InvoiceStatusTest extends TestCase
         $this->assertFalse(InvoiceStatus::PAID->isEditable());
         $this->assertFalse(InvoiceStatus::PAID->isDeletable());
 
-        // Issued invoices should not be editable or deletable (business rule)
-        $this->assertFalse(InvoiceStatus::ISSUED->isEditable());
+        // Issued invoices should be editable but not deletable (updated business rule)
+        $this->assertTrue(InvoiceStatus::ISSUED->isEditable()); // Changed: ISSUED invoices are now editable
         $this->assertFalse(InvoiceStatus::ISSUED->isDeletable());
     }
 

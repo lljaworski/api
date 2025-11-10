@@ -84,7 +84,7 @@ class InvoiceCqrsIntegrationTest extends KernelTestCase
 
         $this->assertNotNull($createdInvoice);
         $this->assertEquals('PLN', $createdInvoice->getCurrency());
-        $this->assertEquals(InvoiceStatus::DRAFT, $createdInvoice->getStatus());
+        $this->assertEquals(InvoiceStatus::ISSUED, $createdInvoice->getStatus()); // Changed from DRAFT to ISSUED
         $this->assertFalse($createdInvoice->isPaid());
         $this->assertEquals('Test invoice notes', $createdInvoice->getNotes());
         $this->assertCount(2, $createdInvoice->getItems());
@@ -107,7 +107,7 @@ class InvoiceCqrsIntegrationTest extends KernelTestCase
         $this->assertNotNull($invoiceDto);
         $this->assertEquals($invoiceId, $invoiceDto->id);
         $this->assertEquals('PLN', $invoiceDto->currency);
-        $this->assertEquals(InvoiceStatus::DRAFT, $invoiceDto->status);
+        $this->assertEquals(InvoiceStatus::ISSUED, $invoiceDto->status); // Changed from DRAFT to ISSUED
         $this->assertFalse($invoiceDto->isPaid);
         $this->assertEquals('Test invoice notes', $invoiceDto->notes);
         $this->assertCount(2, $invoiceDto->items);
@@ -165,16 +165,12 @@ class InvoiceCqrsIntegrationTest extends KernelTestCase
         $this->assertEquals('Updated invoice notes', $updatedInvoiceDto->notes);
         $this->assertCount(1, $updatedInvoiceDto->items);
 
-        // Test Delete Command (soft delete)
+        // Test Delete Command should fail for ISSUED invoices
         $deleteCommand = new DeleteInvoiceCommand($invoiceId);
+        
+        $this->expectException(\Symfony\Component\Messenger\Exception\HandlerFailedException::class);
+        $this->expectExceptionMessage('Invoice cannot be deleted in its current state');
         $this->commandBus->dispatch($deleteCommand);
-
-        // Verify invoice is soft deleted
-        $getInvoiceQuery = new GetInvoiceQuery($invoiceId);
-        $envelope = $this->queryBus->dispatch($getInvoiceQuery);
-        $deletedInvoiceDto = $envelope->last(HandledStamp::class)->getResult();
-
-        $this->assertNull($deletedInvoiceDto); // Should return null for soft-deleted invoices
     }
 
     public function testGetInvoicesQueryWithFiltering(): void
@@ -339,7 +335,7 @@ class InvoiceCqrsIntegrationTest extends KernelTestCase
 
         $this->assertNotNull($createdInvoice);
         $this->assertEquals('PLN', $createdInvoice->getCurrency()); // Default currency
-        $this->assertEquals(InvoiceStatus::DRAFT, $createdInvoice->getStatus());
+        $this->assertEquals(InvoiceStatus::ISSUED, $createdInvoice->getStatus()); // Changed from DRAFT to ISSUED
         $this->assertNull($createdInvoice->getDueDate());
         $this->assertNull($createdInvoice->getPaymentMethod());
         $this->assertNull($createdInvoice->getNotes());

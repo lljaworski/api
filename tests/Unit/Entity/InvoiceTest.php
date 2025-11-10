@@ -33,11 +33,22 @@ class InvoiceTest extends TestCase
             ->setCustomer($this->customer);
     }
 
+    /**
+     * Helper method to set invoice status directly without transition validation (for testing only)
+     */
+    private function setInvoiceStatusDirectly(Invoice $invoice, InvoiceStatus $status): void
+    {
+        $reflection = new \ReflectionClass($invoice);
+        $statusProperty = $reflection->getProperty('status');
+        $statusProperty->setAccessible(true);
+        $statusProperty->setValue($invoice, $status);
+    }
+
     public function testInvoiceCreation(): void
     {
         $this->assertInstanceOf(Invoice::class, $this->invoice);
         $this->assertEquals('INV/2024/001', $this->invoice->getNumber());
-        $this->assertEquals(InvoiceStatus::DRAFT, $this->invoice->getStatus());
+        $this->assertEquals(InvoiceStatus::ISSUED, $this->invoice->getStatus()); // Changed from DRAFT to ISSUED
         $this->assertFalse($this->invoice->isPaid());
         $this->assertEquals('PLN', $this->invoice->getCurrency());
         $this->assertEquals('0.00', $this->invoice->getSubtotal());
@@ -47,51 +58,104 @@ class InvoiceTest extends TestCase
         $this->assertInstanceOf(\DateTimeInterface::class, $this->invoice->getUpdatedAt());
     }
 
+    public function testDefaultInvoiceStatus(): void
+    {
+        // Create a brand new invoice without setting any status
+        $newInvoice = new Invoice();
+        $newInvoice->setNumber('INV/DEFAULT/TEST')
+            ->setIssueDate(new \DateTime())
+            ->setSaleDate(new \DateTime())
+            ->setCustomer($this->customer);
+            
+        // Should default to ISSUED status
+        $this->assertEquals(InvoiceStatus::ISSUED, $newInvoice->getStatus());
+    }
+
     public function testStatusTransitions(): void
     {
+        // Create a draft invoice to test transitions
+        $draftInvoice = new Invoice();
+        $draftInvoice->setNumber('INV/DRAFT/TRANSITIONS')
+            ->setIssueDate(new \DateTime())
+            ->setSaleDate(new \DateTime())
+            ->setCustomer($this->customer);
+        
+        // Set to DRAFT using reflection to bypass default
+        $this->setInvoiceStatusDirectly($draftInvoice, InvoiceStatus::DRAFT);
+        
         // Test valid transitions from DRAFT
-        $this->invoice->setStatus(InvoiceStatus::ISSUED);
-        $this->assertEquals(InvoiceStatus::ISSUED, $this->invoice->getStatus());
+        $draftInvoice->setStatus(InvoiceStatus::ISSUED);
+        $this->assertEquals(InvoiceStatus::ISSUED, $draftInvoice->getStatus());
 
-        $this->invoice->setStatus(InvoiceStatus::PAID);
-        $this->assertEquals(InvoiceStatus::PAID, $this->invoice->getStatus());
+        $draftInvoice->setStatus(InvoiceStatus::PAID);
+        $this->assertEquals(InvoiceStatus::PAID, $draftInvoice->getStatus());
+
+        // Create new invoice and set to PAID for testing invalid transition
+        $paidInvoice = new Invoice();
+        $paidInvoice->setNumber('INV/PAID/TEST')
+            ->setIssueDate(new \DateTime())
+            ->setSaleDate(new \DateTime())
+            ->setCustomer($this->customer);
+        
+        $this->setInvoiceStatusDirectly($paidInvoice, InvoiceStatus::PAID);
 
         // Test invalid transition from PAID
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot transition from paid to cancelled');
-        $this->invoice->setStatus(InvoiceStatus::CANCELLED);
+        $paidInvoice->setStatus(InvoiceStatus::CANCELLED);
     }
 
     public function testBusinessLogicMethods(): void
     {
-        // Test draft invoice can be edited and deleted
-        $this->assertTrue($this->invoice->canBeEdited());
-        $this->assertTrue($this->invoice->canBeDeleted());
-
-        // Test issued invoice cannot be edited but can be deleted
-        $this->invoice->setStatus(InvoiceStatus::ISSUED);
-        $this->assertFalse($this->invoice->canBeEdited());
-        $this->assertFalse($this->invoice->canBeDeleted());
-
-        // Test cancelled invoice can be deleted
-        $this->invoice = new Invoice();
-        $this->invoice->setNumber('INV/2024/002')
+        // Create a draft invoice to test edit/delete permissions
+        $draftInvoice = new Invoice();
+        $draftInvoice->setNumber('INV/DRAFT/TEST')
             ->setIssueDate(new \DateTime())
             ->setSaleDate(new \DateTime())
-            ->setCustomer($this->customer)
-            ->setStatus(InvoiceStatus::CANCELLED);
-        $this->assertTrue($this->invoice->canBeDeleted());
+            ->setCustomer($this->customer);
+        
+        // Set to DRAFT using reflection
+        $this->setInvoiceStatusDirectly($draftInvoice, InvoiceStatus::DRAFT);
+        
+        // Test draft invoice can be edited and deleted
+        $this->assertTrue($draftInvoice->canBeEdited());
+        $this->assertTrue($draftInvoice->canBeDeleted());
+
+        // Test issued invoice can be edited but cannot be deleted (our main test invoice is ISSUED by default)
+        $this->assertTrue($this->invoice->canBeEdited()); // Changed: ISSUED invoices can now be edited
+        $this->assertFalse($this->invoice->canBeDeleted());
+
+        // Test cancelled invoice can be deleted but cannot be edited
+        $cancelledInvoice = new Invoice();
+        $cancelledInvoice->setNumber('INV/2024/002')
+            ->setIssueDate(new \DateTime())
+            ->setSaleDate(new \DateTime())
+            ->setCustomer($this->customer);
+        $this->setInvoiceStatusDirectly($cancelledInvoice, InvoiceStatus::CANCELLED);
+        $this->assertTrue($cancelledInvoice->canBeDeleted());
+        $this->assertFalse($cancelledInvoice->canBeEdited()); // CANCELLED invoices cannot be edited
     }
 
     public function testIssueInvoice(): void
     {
-        $this->invoice->issue();
-        $this->assertEquals(InvoiceStatus::ISSUED, $this->invoice->getStatus());
+        // Create a draft invoice to test the issue() method
+        $draftInvoice = new Invoice();
+        $draftInvoice->setNumber('INV/DRAFT/001')
+            ->setIssueDate(new \DateTime())
+            ->setSaleDate(new \DateTime())
+            ->setCustomer($this->customer);
+        
+        // Set to DRAFT using reflection
+        $this->setInvoiceStatusDirectly($draftInvoice, InvoiceStatus::DRAFT);
+        $this->assertEquals(InvoiceStatus::DRAFT, $draftInvoice->getStatus());
+        
+        $draftInvoice->issue();
+        $this->assertEquals(InvoiceStatus::ISSUED, $draftInvoice->getStatus());
     }
 
     public function testMarkAsPaid(): void
     {
-        $this->invoice->setStatus(InvoiceStatus::ISSUED);
+        // The invoice is already ISSUED by default, which can transition to PAID
         $beforePaid = new \DateTime();
         
         $this->invoice->markAsPaid();
@@ -104,18 +168,18 @@ class InvoiceTest extends TestCase
 
     public function testCancelInvoice(): void
     {
+        // The invoice is already ISSUED by default, so we can cancel it directly
         $this->invoice->cancel();
         $this->assertEquals(InvoiceStatus::CANCELLED, $this->invoice->getStatus());
     }
 
     public function testOverdueLogic(): void
     {
-        // Not overdue - no due date
+        // Not overdue - no due date (invoice is ISSUED by default)
         $this->assertFalse($this->invoice->isOverdue());
 
         // Not overdue - future due date
-        $this->invoice->setStatus(InvoiceStatus::ISSUED)
-            ->setDueDate(new \DateTime('+7 days'));
+        $this->invoice->setDueDate(new \DateTime('+7 days'));
         $this->assertFalse($this->invoice->isOverdue());
 
         // Overdue - past due date
@@ -126,7 +190,7 @@ class InvoiceTest extends TestCase
         $this->invoice->setIsPaid(true);
         $this->assertFalse($this->invoice->isOverdue());
 
-        // Not overdue - draft status (create new invoice to avoid invalid transition)
+        // Not overdue - draft status (create new invoice to test)
         $draftInvoice = new Invoice();
         $draftInvoice->setNumber('INV/DRAFT/001')
             ->setIssueDate(new \DateTime())
@@ -134,29 +198,41 @@ class InvoiceTest extends TestCase
             ->setCustomer($this->customer)
             ->setDueDate(new \DateTime('-1 day')); // Past due date
         
+        // Set to DRAFT using reflection
+        $this->setInvoiceStatusDirectly($draftInvoice, InvoiceStatus::DRAFT);
+        
         // Draft invoices are never overdue
         $this->assertFalse($draftInvoice->isOverdue());
     }
 
     public function testSoftDelete(): void
     {
-        $this->assertFalse($this->invoice->isDeleted());
-        $this->assertTrue($this->invoice->isActive());
-        $this->assertNull($this->invoice->getDeletedAt());
+        // Create a draft invoice for soft delete test
+        $draftInvoice = new Invoice();
+        $draftInvoice->setNumber('INV/DRAFT/DELETE')
+            ->setIssueDate(new \DateTime())
+            ->setSaleDate(new \DateTime())
+            ->setCustomer($this->customer);
+        
+        // Set to DRAFT using reflection to allow deletion
+        $this->setInvoiceStatusDirectly($draftInvoice, InvoiceStatus::DRAFT);
+        
+        $this->assertFalse($draftInvoice->isDeleted());
+        $this->assertTrue($draftInvoice->isActive());
+        $this->assertNull($draftInvoice->getDeletedAt());
 
         $beforeDelete = new \DateTime();
-        $this->invoice->softDelete();
+        $draftInvoice->softDelete();
 
-        $this->assertTrue($this->invoice->isDeleted());
-        $this->assertFalse($this->invoice->isActive());
-        $this->assertInstanceOf(\DateTimeInterface::class, $this->invoice->getDeletedAt());
-        $this->assertGreaterThanOrEqual($beforeDelete, $this->invoice->getDeletedAt());
+        $this->assertTrue($draftInvoice->isDeleted());
+        $this->assertFalse($draftInvoice->isActive());
+        $this->assertInstanceOf(\DateTimeInterface::class, $draftInvoice->getDeletedAt());
+        $this->assertGreaterThanOrEqual($beforeDelete, $draftInvoice->getDeletedAt());
     }
 
     public function testSoftDeleteFailsForIssuedInvoice(): void
     {
-        $this->invoice->setStatus(InvoiceStatus::ISSUED);
-        
+        // Use the main test invoice which is ISSUED by default
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot delete invoice with status issued');
         $this->invoice->softDelete();
@@ -164,13 +240,23 @@ class InvoiceTest extends TestCase
 
     public function testRestore(): void
     {
-        $this->invoice->softDelete();
-        $this->assertTrue($this->invoice->isDeleted());
+        // Create a draft invoice that can be soft deleted
+        $draftInvoice = new Invoice();
+        $draftInvoice->setNumber('INV/RESTORE/TEST')
+            ->setIssueDate(new \DateTime())
+            ->setSaleDate(new \DateTime())
+            ->setCustomer($this->customer);
+        
+        // Set to DRAFT using reflection to allow deletion
+        $this->setInvoiceStatusDirectly($draftInvoice, InvoiceStatus::DRAFT);
+        
+        $draftInvoice->softDelete();
+        $this->assertTrue($draftInvoice->isDeleted());
 
-        $this->invoice->restore();
-        $this->assertFalse($this->invoice->isDeleted());
-        $this->assertTrue($this->invoice->isActive());
-        $this->assertNull($this->invoice->getDeletedAt());
+        $draftInvoice->restore();
+        $this->assertFalse($draftInvoice->isDeleted());
+        $this->assertTrue($draftInvoice->isActive());
+        $this->assertNull($draftInvoice->getDeletedAt());
     }
 
     public function testAddAndRemoveItems(): void

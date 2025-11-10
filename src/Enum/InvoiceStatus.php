@@ -33,7 +33,7 @@ enum InvoiceStatus: string
 
     public function isEditable(): bool
     {
-        return $this === self::DRAFT;
+        return in_array($this, [self::DRAFT, self::ISSUED]);
     }
 
     public function isDeletable(): bool

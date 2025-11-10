@@ -24,6 +24,7 @@ class SystemPreferenceApiTest extends WebTestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->client = static::createClient();
         $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
         
@@ -34,6 +35,7 @@ class SystemPreferenceApiTest extends WebTestCase
     protected function tearDown(): void
     {
         // Clean up test data
+        $this->cleanupTestData();
         $this->cleanupTestPreferences();
         parent::tearDown();
     }
@@ -46,13 +48,16 @@ class SystemPreferenceApiTest extends WebTestCase
 
     public function testGetSystemPreferencesCollectionWithAuth(): void
     {
-        $this->requestAsAdmin(Request::METHOD_GET, '/api/system-preferences');
+        $this->requestAsAdmin(Request::METHOD_GET, '/api/system-preferences', [], [], [
+            'HTTP_ACCEPT' => 'application/json'
+        ]);
         
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('member', $responseData);
-        $this->assertIsArray($responseData['member']);
+        $this->assertArrayHasKey('data', $responseData);
+        $this->assertIsArray($responseData['data']);
+        $this->assertArrayHasKey('pagination', $responseData);
     }
 
     public function testCreateSystemPreference(): void
@@ -356,12 +361,15 @@ class SystemPreferenceApiTest extends WebTestCase
         $this->createTestPreference(PreferenceKey::SITE_DESCRIPTION, 'Description 1');
         $this->createTestPreference(PreferenceKey::SITE_URL, 'https://site1.com');
         
-        $this->requestAsAdmin(Request::METHOD_GET, '/api/system-preferences');
+        $this->requestAsAdmin(Request::METHOD_GET, '/api/system-preferences', [], [], [
+            'HTTP_ACCEPT' => 'application/json'
+        ]);
         
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertGreaterThanOrEqual(3, $responseData['pagination']['total'] ?? count($responseData['member']));
+        $this->assertGreaterThanOrEqual(3, $responseData['pagination']['total'] ?? 0);
+        $this->assertIsArray($responseData['data']);
     }
 
     /**
