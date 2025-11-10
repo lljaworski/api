@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\DTO;
 
 use App\Enum\InvoiceStatus;
+use App\Enum\PaymentMethodEnum;
 
 /**
  * Data Transfer Object for Invoice data.
@@ -18,7 +19,7 @@ final class InvoiceDTO
         public readonly \DateTimeImmutable $saleDate,
         public readonly ?\DateTimeImmutable $dueDate,
         public readonly string $currency,
-        public readonly ?int $paymentMethod,
+        public readonly ?PaymentMethodEnum $paymentMethod,
         public readonly InvoiceStatus $status,
         public readonly bool $isPaid,
         public readonly ?\DateTimeImmutable $paidAt,
