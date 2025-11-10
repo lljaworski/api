@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Enum\InvoiceStatus;
+use App\Enum\PaymentMethodEnum;
 use App\Repository\InvoiceRepository;
 use App\State\InvoiceProcessor;
 use App\State\InvoiceProvider;
@@ -133,10 +134,9 @@ class Invoice
     #[Groups(['invoice:read', 'invoice:list', 'invoice:details', 'invoice:create', 'invoice:update'])]
     private string $currency = 'PLN';
 
-    #[ORM\Column(nullable: true)]
-    #[Assert\Range(min: 1, max: 50, groups: ['invoice:create', 'invoice:update'])]
+    #[ORM\Column(type: 'string', enumType: PaymentMethodEnum::class, nullable: true)]
     #[Groups(['invoice:read', 'invoice:details', 'invoice:create', 'invoice:update'])]
-    private ?int $paymentMethod = null;
+    private ?PaymentMethodEnum $paymentMethod = null;
 
     #[ORM\Column(type: 'string', enumType: InvoiceStatus::class)]
     #[Groups(['invoice:read', 'invoice:list', 'invoice:details'])]
@@ -280,12 +280,12 @@ class Invoice
         return $this;
     }
 
-    public function getPaymentMethod(): ?int
+    public function getPaymentMethod(): ?PaymentMethodEnum
     {
         return $this->paymentMethod;
     }
 
-    public function setPaymentMethod(?int $paymentMethod): static
+    public function setPaymentMethod(?PaymentMethodEnum $paymentMethod): static
     {
         $this->paymentMethod = $paymentMethod;
         $this->touch();

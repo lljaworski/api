@@ -11,6 +11,7 @@ use App\Application\Query\Invoice\GetInvoiceQuery;
 use App\Application\Query\Invoice\GetInvoicesQuery;
 use App\Entity\Company;
 use App\Enum\InvoiceStatus;
+use App\Enum\PaymentMethodEnum;
 use App\Tests\Trait\DatabaseTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -57,7 +58,7 @@ class InvoiceCqrsIntegrationTest extends KernelTestCase
             saleDate: new \DateTime('2024-01-01'),
             dueDate: new \DateTime('2024-01-31'),
             currency: 'PLN',
-            paymentMethod: 1,
+            paymentMethod: PaymentMethodEnum::WIRE_TRANSFERS,
             notes: 'Test invoice notes',
             items: [
                 [

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Command\Invoice;
 
 use App\Application\Command\AbstractCommand;
+use App\Enum\PaymentMethodEnum;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -35,8 +36,7 @@ final class UpdateInvoiceCommand extends AbstractCommand
         #[Assert\Choice(choices: ['PLN', 'EUR', 'USD', 'GBP', 'CHF', 'CZK', 'SEK', 'NOK', 'DKK'])]
         public readonly ?string $currency = null,
         
-        #[Assert\Range(min: 1, max: 50)]
-        public readonly ?int $paymentMethod = null,
+        public readonly ?PaymentMethodEnum $paymentMethod = null,
         
         #[Assert\Length(max: 1000)]
         public readonly ?string $notes = null,

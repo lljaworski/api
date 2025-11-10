@@ -8,6 +8,7 @@ use App\Entity\Company;
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
 use App\Enum\InvoiceStatus;
+use App\Enum\PaymentMethodEnum;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -113,27 +114,20 @@ class InvoiceValidationTest extends KernelTestCase
     {
         $invoice = $this->createValidInvoice();
         
-        // Test invalid payment method (too low)
-        $invoice->setPaymentMethod(0);
-        $violations = $this->validator->validate($invoice, groups: ['invoice:create']);
-        $this->assertGreaterThan(0, $violations->count());
-        
-        // Test invalid payment method (too high)
-        $invoice->setPaymentMethod(51);
-        $violations = $this->validator->validate($invoice, groups: ['invoice:create']);
-        $this->assertGreaterThan(0, $violations->count());
-        
-        // Test valid payment methods
-        for ($method = 1; $method <= 50; $method++) {
-            $invoice->setPaymentMethod($method);
+        // Test all valid payment method enum values
+        foreach (PaymentMethodEnum::cases() as $paymentMethod) {
+            $invoice->setPaymentMethod($paymentMethod);
             $violations = $this->validator->validate($invoice, groups: ['invoice:create']);
-            $this->assertCount(0, $violations, "Payment method {$method} should be valid");
+            $this->assertCount(0, $violations, "Payment method {$paymentMethod->value} should be valid");
         }
         
         // Test null payment method (should be allowed)
         $invoice->setPaymentMethod(null);
         $violations = $this->validator->validate($invoice, groups: ['invoice:create']);
         $this->assertCount(0, $violations);
+        
+        // Note: Invalid enum values are now prevented by PHP type system at compile time
+        // No need to test invalid values as they will cause TypeError before validation
     }
 
     public function testNotesValidation(): void
@@ -383,7 +377,7 @@ class InvoiceValidationTest extends KernelTestCase
                ->setSaleDate(new \DateTime('2024-01-01'))
                ->setDueDate(new \DateTime('2024-01-31'))
                ->setCurrency('PLN')
-               ->setPaymentMethod(1)
+               ->setPaymentMethod(PaymentMethodEnum::CASH)
                ->setNotes('Test invoice notes')
                ->setCustomer($this->testCustomer);
         

@@ -85,7 +85,7 @@ class InvoiceApiTest extends WebTestCase
             'saleDate' => '2024-01-01',
             'dueDate' => '2024-01-31',
             'currency' => 'PLN',
-            'paymentMethod' => 1,
+            'paymentMethod' => 'digital_wallets',
             'notes' => 'Test invoice notes',
             'customer' => $this->getCustomerIri(),
             'items' => [

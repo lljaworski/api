@@ -8,6 +8,7 @@ use App\Entity\Company;
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
 use App\Enum\InvoiceStatus;
+use App\Enum\PaymentMethodEnum;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -386,8 +387,8 @@ class InvoiceTest extends TestCase
     {
         $this->assertNull($this->invoice->getPaymentMethod());
 
-        $this->invoice->setPaymentMethod(1);
-        $this->assertEquals(1, $this->invoice->getPaymentMethod());
+        $this->invoice->setPaymentMethod(PaymentMethodEnum::DIGITAL_WALLETS);
+        $this->assertEquals(PaymentMethodEnum::DIGITAL_WALLETS, $this->invoice->getPaymentMethod());
 
         $this->invoice->setPaymentMethod(null);
         $this->assertNull($this->invoice->getPaymentMethod());

@@ -47,7 +47,7 @@ class InvoiceWorkflowIntegrationTest extends WebTestCase
             'saleDate' => '2024-01-01',
             'dueDate' => '2024-01-31',
             'currency' => 'PLN',
-            'paymentMethod' => 1,
+            'paymentMethod' => 'cash',
             'notes' => 'Lifecycle test invoice',
             'customer' => $this->getCustomerIri(),
             'items' => [
