@@ -15,6 +15,7 @@ use App\Enum\PreferenceKey;
 use App\Repository\SystemPreferenceRepository;
 use App\State\SystemPreferenceProcessor;
 use App\State\SystemPreferenceProvider;
+use App\Validator\Constraints\ValidSystemPreferenceValue;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -29,6 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     message: 'This preference key already exists.',
     groups: ['preference:create']
 )]
+#[ValidSystemPreferenceValue(groups: ['preference:create', 'preference:update'])]
 #[ApiResource(
     operations: [
         new GetCollection(

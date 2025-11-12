@@ -16,6 +16,7 @@ enum PreferenceKey: string
     case ITEMS_PER_PAGE = 'items_per_page';
     case ENABLE_REGISTRATION = 'enable_registration';
     case ENABLE_API = 'enable_api';
+    case INVOICE_NUMBER_FORMAT = 'invoice_number_format';
 
     public function getLabel(): string
     {
@@ -30,6 +31,7 @@ enum PreferenceKey: string
             self::ITEMS_PER_PAGE => 'Items Per Page',
             self::ENABLE_REGISTRATION => 'Enable Registration',
             self::ENABLE_API => 'Enable API',
+            self::INVOICE_NUMBER_FORMAT => 'Invoice Number Format',
         };
     }
 
@@ -46,6 +48,7 @@ enum PreferenceKey: string
             self::ITEMS_PER_PAGE => 'Default number of items per page in lists',
             self::ENABLE_REGISTRATION => 'Allow new user registrations',
             self::ENABLE_API => 'Enable API endpoints',
+            self::INVOICE_NUMBER_FORMAT => 'Format string for invoice numbering. Must contain {year}, {month}, and {number} placeholders. Example: {year}/{month}/{number}',
         };
     }
 }
