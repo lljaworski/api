@@ -33,5 +33,11 @@ class DictionaryProviderPass implements CompilerPassInterface
             new Reference('app.dictionary.provider.tax_status'),
             ['ROLE_ADMIN']
         ]);
+
+        // Register payment methods provider with admin requirement
+        $definition->addMethodCall('registerProvider', [
+            new Reference('app.dictionary.provider.payment_methods'),
+            ['ROLE_ADMIN']
+        ]);
     }
 }

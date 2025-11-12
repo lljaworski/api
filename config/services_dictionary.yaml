@@ -13,4 +13,9 @@ services:
             $type: 'tax_status'
             $enumClass: 'App\Enum\TaxStatusEnum'
 
+    app.dictionary.provider.payment_methods:
+        class: App\Dictionary\Provider\EnumDictionaryProvider
+        arguments:
+            $type: 'payment_methods'
+            $enumClass: 'App\Enum\PaymentMethodEnum'
     # Dictionary Registry is configured via compiler pass (see DictionaryProviderPass)
