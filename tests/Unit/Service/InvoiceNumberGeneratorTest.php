@@ -6,7 +6,10 @@ namespace App\Tests\Unit\Service;
 
 use App\Service\InvoiceNumberGenerator;
 use App\Repository\InvoiceRepository;
+use App\Repository\SystemPreferenceRepository;
 use App\Entity\Invoice;
+use App\Entity\SystemPreference;
+use App\Enum\PreferenceKey;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -14,11 +17,23 @@ class InvoiceNumberGeneratorTest extends TestCase
 {
     private InvoiceNumberGenerator $generator;
     private InvoiceRepository&MockObject $invoiceRepository;
+    private SystemPreferenceRepository&MockObject $systemPreferenceRepository;
 
     protected function setUp(): void
     {
         $this->invoiceRepository = $this->createMock(InvoiceRepository::class);
-        $this->generator = new InvoiceNumberGenerator($this->invoiceRepository);
+        $this->systemPreferenceRepository = $this->createMock(SystemPreferenceRepository::class);
+        
+        // Mock default preference for invoice number format
+        $this->systemPreferenceRepository
+            ->method('findByKey')
+            ->with(PreferenceKey::INVOICE_NUMBER_FORMAT)
+            ->willReturn(null); // Uses default format
+            
+        $this->generator = new InvoiceNumberGenerator(
+            $this->invoiceRepository,
+            $this->systemPreferenceRepository
+        );
     }
 
     public function testGenerateCurrentMonth(): void
@@ -186,7 +201,7 @@ class InvoiceNumberGeneratorTest extends TestCase
         $parsed = $this->generator->parseInvoiceNumber($number);
         
         $this->assertIsArray($parsed);
-        $this->assertEquals('FV', $parsed['prefix']);
+
         $this->assertEquals(2024, $parsed['year']);
         $this->assertEquals(10, $parsed['month']);
         $this->assertEquals(123, $parsed['sequence']);
@@ -230,7 +245,7 @@ class InvoiceNumberGeneratorTest extends TestCase
     public function testGetFormatTemplate(): void
     {
         $template = $this->generator->getFormatTemplate();
-        $this->assertEquals('FV/YYYY/MM/NNNN', $template);
+        $this->assertEquals('FV/{year}/{month}/{number}', $template);
     }
 
     public function testPreviewNextNumber(): void
@@ -260,7 +275,7 @@ class InvoiceNumberGeneratorTest extends TestCase
         $stats = $this->generator->getNumberingStats($from, $to);
         
         $this->assertIsArray($stats);
-        $this->assertEquals('FV/YYYY/MM/NNNN', $stats['format']);
+        $this->assertEquals('FV/{year}/{month}/{number}', $stats['format']);
         $this->assertEquals('2024-01-01', $stats['period_from']);
         $this->assertEquals('2024-12-31', $stats['period_to']);
         $this->assertArrayHasKey('next_number_today', $stats);

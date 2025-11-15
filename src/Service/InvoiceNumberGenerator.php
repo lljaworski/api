@@ -51,10 +51,12 @@ class InvoiceNumberGenerator
         $format = $this->getConfiguredFormat();
         
         // Convert format template to regex pattern
+        // First escape special regex characters, then replace placeholders
+        $escapedFormat = preg_quote($format, '/');
         $pattern = '/^' . str_replace(
-            ['{year}', '{month}', '{number}', '/', '-', '_'],
-            ['\\d{4}', '\\d{2}', '\\d{4}', '\\/', '\\-', '\\_'],
-            preg_quote($format, '/')
+            ['\{year\}', '\{month\}', '\{number\}'],
+            ['\d{4}', '\d{2}', '\d{4}'],
+            $escapedFormat
         ) . '$/';
         
         return preg_match($pattern, $number) === 1;
@@ -73,10 +75,11 @@ class InvoiceNumberGenerator
         $format = $this->getConfiguredFormat();
         
         // Create regex with capture groups for year, month, number
+        $escapedFormat = preg_quote($format, '/');
         $pattern = '/^' . str_replace(
-            ['{year}', '{month}', '{number}'],
-            ['(\\d{4})', '(\\d{2})', '(\\d{4})'],
-            preg_quote($format, '/')
+            ['\{year\}', '\{month\}', '\{number\}'],
+            ['(\d{4})', '(\d{2})', '(\d{4})'],
+            $escapedFormat
         ) . '$/';
         
         if (preg_match($pattern, $number, $matches)) {
@@ -125,7 +128,7 @@ class InvoiceNumberGenerator
         $timestamp = $issueDate->format('His');
         return sprintf(
             '%s/%s/%s/%04d-%s',
-            self::PREFIX,
+            'FV',
             $issueDate->format('Y'),
             $issueDate->format('m'),
             $this->invoiceRepository->getNextSequenceNumber($issueDate),
