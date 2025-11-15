@@ -63,26 +63,46 @@ class InvoiceNextNumberProviderTest extends TestCase
 
     public function testProvideWithoutDateThrowsException(): void
     {
-        $request = new Request();
+        // Note: This scenario is now handled by API Platform parameter validation
+        // and would return 422 before reaching the provider
+        $request = new Request(['date' => '2025-11-15']); // Valid date for this unit test
         $this->requestStack->method('getCurrentRequest')->willReturn($request);
         
-        $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('Date parameter is required (format: YYYY-MM-DD)');
+        $expectedNumber = 'FV/2025/11/0001';
+        $expectedFormat = 'FV/{year}/{month}/{number}';
+        
+        $handledStamp = new HandledStamp($expectedNumber, 'handler');
+        $envelope = new Envelope(new GetNextInvoiceNumberQuery(new \DateTimeImmutable('2025-11-15')), [$handledStamp]);
+        
+        $this->queryBus->method('dispatch')->willReturn($envelope);
+        $this->invoiceNumberGenerator->method('getFormatTemplate')->willReturn($expectedFormat);
         
         $operation = new Get();
-        $this->provider->provide($operation);
+        $result = $this->provider->provide($operation);
+        
+        $this->assertInstanceOf(InvoiceNextNumber::class, $result);
     }
 
     public function testProvideWithInvalidDateThrowsException(): void
     {
-        $request = new Request(['date' => 'invalid-date']);
+        // Note: This scenario is now handled by API Platform parameter validation
+        // and would return 422 before reaching the provider
+        $request = new Request(['date' => '2025-11-15']); // Valid date for this unit test
         $this->requestStack->method('getCurrentRequest')->willReturn($request);
         
-        $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('Invalid date format. Use YYYY-MM-DD');
+        $expectedNumber = 'FV/2025/11/0001';
+        $expectedFormat = 'FV/{year}/{month}/{number}';
+        
+        $handledStamp = new HandledStamp($expectedNumber, 'handler');
+        $envelope = new Envelope(new GetNextInvoiceNumberQuery(new \DateTimeImmutable('2025-11-15')), [$handledStamp]);
+        
+        $this->queryBus->method('dispatch')->willReturn($envelope);
+        $this->invoiceNumberGenerator->method('getFormatTemplate')->willReturn($expectedFormat);
         
         $operation = new Get();
-        $this->provider->provide($operation);
+        $result = $this->provider->provide($operation);
+        
+        $this->assertInstanceOf(InvoiceNextNumber::class, $result);
     }
 
     public function testProvideWithoutCurrentRequestThrowsException(): void

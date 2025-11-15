@@ -30,16 +30,8 @@ readonly class InvoiceNextNumberProvider implements ProviderInterface
             throw new BadRequestHttpException('Request not available');
         }
 
-        $dateString = $request->query->get('date');
-        if (!$dateString) {
-            throw new BadRequestHttpException('Date parameter is required (format: YYYY-MM-DD)');
-        }
-
-        try {
-            $issueDate = new DateTimeImmutable($dateString);
-        } catch (\Exception) {
-            throw new BadRequestHttpException('Invalid date format. Use YYYY-MM-DD');
-        }
+        // Date is already validated by API Platform parameter validation
+        $issueDate = new DateTimeImmutable($request->query->get('date'));
 
         // Use CQRS to get the next invoice number
         $query = new GetNextInvoiceNumberQuery($issueDate);

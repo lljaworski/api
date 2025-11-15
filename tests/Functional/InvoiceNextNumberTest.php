@@ -62,7 +62,7 @@ class InvoiceNextNumberTest extends WebTestCase
             'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
         ]);
 
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $this->client->getResponse()->getStatusCode());
     }
 
     public function testGetNextInvoiceNumberWithInvalidDate(): void
@@ -75,7 +75,7 @@ class InvoiceNextNumberTest extends WebTestCase
             'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
         ]);
 
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $this->client->getResponse()->getStatusCode());
     }
 
     public function testGetNextInvoiceNumberRequiresAuthentication(): void
