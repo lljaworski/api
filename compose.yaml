@@ -7,3 +7,28 @@ services:
     ports:
       - "3306:3306"
     tmpfs: /var/lib/mysql
+
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin123
+
+  playwright-mcp:
+    image: mcp/playwright
+    ports:
+      - "8931:8931"
+    volumes:
+      - playwright_sessions:/tmp/playwright-output
+    environment:
+      - PLAYWRIGHT_MCP_OUTPUT_DIR=/tmp/playwright-output
+    command: ["--headless", "--browser", "chromium", "--no-sandbox", "--port", "8931", "--host", "0.0.0.0"]
+
+volumes:
+  n8n_data:
+  playwright_sessions:
