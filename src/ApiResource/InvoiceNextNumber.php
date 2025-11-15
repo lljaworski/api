@@ -7,6 +7,7 @@ namespace App\ApiResource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Operation;
 use App\State\InvoiceNextNumberProvider;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -27,7 +28,13 @@ use Symfony\Component\Validator\Constraints as Assert;
                     description: 'Issue date for invoice number generation (format: YYYY-MM-DD)',
                     required: true
                 )
-            ]
+                ],
+            openapi: new Operation(
+                tags: ['Invoice'],
+                summary: 'Get next invoice number',
+                description: 'Returns the next available invoice number for the specified date'
+            )
+
         )
     ],
     formats: ['json' => ['application/json'], 'jsonld' => ['application/ld+json']],
