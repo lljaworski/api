@@ -38,12 +38,6 @@ final class UpdateUserCommandHandler
             $user->setUsername($command->username);
         }
         
-        // Update password if provided
-        if ($command->plainPassword !== null) {
-            $hashedPassword = $this->passwordHasher->hashPassword($user, $command->plainPassword);
-            $user->setPassword($hashedPassword);
-        }
-        
         // Update roles if provided
         if ($command->roles !== null) {
             $user->setRoles($command->roles);
